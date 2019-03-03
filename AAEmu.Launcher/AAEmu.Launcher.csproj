@@ -11,6 +11,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -21,10 +22,13 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>0.1.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ProductName>AAEmu Launcher</ProductName>
+    <SuiteName>AAEmu Launcher</SuiteName>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>0.3.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -52,6 +56,24 @@
   <PropertyGroup>
     <ApplicationIcon>aaemu.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>37D977E1C3B994E1C59520BA3E952922E469FEAF</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>AAEmu.Launcher_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -69,6 +91,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="DebugHelperForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DebugHelperForm.Designer.cs">
+      <DependentUpon>DebugHelperForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -77,20 +111,37 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="DebugHelperForm.resx">
+      <DependentUpon>DebugHelperForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
+    <None Include="aaemu.info.aelcf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="lng\de.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="lng\fr.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="lng\ru.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="lng\en_us.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Properties\app.manifest" />
+    <None Include="settings.aelcf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -106,67 +157,68 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\background.png" />
+    <None Include="Res\Discord_Logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\But_Lang_De.png" />
+    <None Include="Res\GitHub_Logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\But_Lang_En.png" />
+    <None Include="Res\Discord_Logo_Active.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\But_Lang_Ru.png" />
+    <None Include="Res\GitHub_Logo_Active.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\But_Power.png" />
+    <None Include="Res\Discord_Logo_Only.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\But_Settings.png" />
+    <None Include="Res\Discord_Logo_Only_Active.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Logo.png" />
+    <None Include="Res\GitHub_Logo_Only.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Logo_Active.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Discord_Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GitHub_Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Discord_Logo_Active.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GitHub_Logo_Active.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Discord_Logo_Only.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Discord_Logo_Only_Active.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GitHub_Logo_Only.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GitHub_Logo_Only_Active.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\But_Power_Active.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\But_Settings_Active.png" />
+    <None Include="Res\GitHub_Logo_Only_Active.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="aaemu.ico" />
-    <None Include="Resources\btn_conf.png" />
-    <None Include="Resources\btn_conf_a.png" />
-    <None Include="Resources\btn_pickup.png" />
-    <None Include="Resources\btn_pickup_a.png" />
-    <None Include="Resources\btn_portal_exit.png" />
-    <None Include="Resources\btn_portal_exit_a.png" />
+    <None Include="Res\btn_red.png" />
+    <None Include="Res\flag_cn.png" />
+    <None Include="Res\flag_de.png" />
+    <None Include="Res\flag_fr.png" />
+    <None Include="Res\flag_jp.png" />
+    <None Include="Res\flag_ko.png" />
+    <None Include="Res\flag_ru.png" />
+    <None Include="Res\flag_tw.png" />
+    <None Include="Res\flag_us.png" />
+    <None Include="Res\flag_english.png" />
+    <None Include="Res\flag_eu.png" />
+    <None Include="Res\flag_xx.png" />
+    <None Include="Res\mini_locale_cn.png" />
+    <None Include="Res\mini_locale_de.png" />
+    <None Include="Res\mini_locale_en_us.png" />
+    <None Include="Res\mini_locale_fr.png" />
+    <None Include="Res\mini_locale_jp.png" />
+    <None Include="Res\mini_locale_kr.png" />
+    <None Include="Res\mini_locale_ru.png" />
+    <None Include="Res\bgnews.b64.txt" />
+    <Content Include="data\data.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Res\bignews1.png" />
+    <Content Include="ToolsA.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Res\btn_green_d.png" />
+    <None Include="Res\bg_setup.png" />
+    <None Include="Res\bg_login.png" />
+    <None Include="Res\aaemu_logo.png" />
+    <None Include="Res\btn_green_small.png" />
+    <None Include="Res\btn_red_small.png" />
+    <None Include="Res\bg_newsfeed.png" />
+    <None Include="Res\btn_green_a.png" />
+    <None Include="Res\btn_green.png" />
+    <None Include="Res\bg.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
@@ -179,6 +231,14 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <FileAssociation Include=".aelcf">
+      <Visible>False</Visible>
+      <Description>AAEmu Launcher Config File</Description>
+      <Progid>aaemu.launcher.config</Progid>
+      <DefaultIcon>aaemu.ico</DefaultIcon>
+    </FileAssociation>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
