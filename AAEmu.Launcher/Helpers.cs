@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Sockets;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Net;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using System.Security.Cryptography;
+using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace AAEmu.Launcher
 {
@@ -83,109 +84,66 @@ namespace AAEmu.Launcher
         }
     }
 
-
-    public static class RC4
-    {
-        public static string Encrypt(string key, string data)
-        {
-            Encoding unicode = Encoding.Unicode;
-
-            return Convert.ToBase64String(Encrypt(unicode.GetBytes(key), unicode.GetBytes(data)));
-        }
-
-        public static string Decrypt(string key, string data)
-        {
-            Encoding unicode = Encoding.Unicode;
-
-            return unicode.GetString(Encrypt(unicode.GetBytes(key), Convert.FromBase64String(data)));
-        }
-
-        public static byte[] Encrypt(byte[] key, byte[] data)
-        {
-            return EncryptOutput(key, data).ToArray();
-        }
-
-        public static byte[] Decrypt(byte[] key, byte[] data)
-        {
-            return EncryptOutput(key, data).ToArray();
-        }
-
-        private static byte[] EncryptInitalize(byte[] key)
-        {
-            byte[] s = Enumerable.Range(0, 256)
-              .Select(i => (byte)i)
-              .ToArray();
-
-            for (int i = 0, j = 0; i < 256; i++)
-            {
-                j = (j + key[i % key.Length] + s[i]) & 255;
-
-                Swap(s, i, j);
-            }
-
-            return s;
-        }
-
-        private static IEnumerable<byte> EncryptOutput(byte[] key, IEnumerable<byte> data)
-        {
-            byte[] s = EncryptInitalize(key);
-
-            int i = 0;
-            int j = 0;
-
-            return data.Select((b) =>
-            {
-                i = (i + 1) & 255;
-                j = (j + s[i]) & 255;
-
-                Swap(s, i, j);
-
-                return (byte)(b ^ s[(s[i] + s[j]) & 255]);
-            });
-        }
-
-        private static void Swap(byte[] s, int i, int j)
-        {
-            byte c = s[i];
-
-            s[i] = s[j];
-            s[j] = c;
-        }
-    }
-
-
-
     public static class WebHelper
     {
-        public static string SimpleGetURIAsString(string uri)
+        public static string SimpleGetURIAsString(string uri, int timeOut = -1)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            if (timeOut >= 0)
+                request.Timeout = timeOut;
             request.UserAgent = "AAEmu.Launcher";
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
+            try
             {
-                return reader.ReadToEnd();
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();
+                }
+            }
+            catch
+            {
+                return "";
             }
         }
 
-        public static MemoryStream SimpleGetURIAsMemoryStream(string uri)
+        public static MemoryStream SimpleGetURIAsMemoryStream(string uri, int timeOut = -1)
         {
             MemoryStream ms = new MemoryStream();
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.UserAgent = "AAEmu.Launcher";
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
+            try
             {
-                stream.CopyTo(ms);
-                return ms ;
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+                if (timeOut >= 0)
+                    request.Timeout = timeOut;
+                request.UserAgent = "AAEmu.Launcher";
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                {
+                    stream.CopyTo(ms);
+                    return ms;
+                }
+            }
+            catch
+            {
+                ms.SetLength(0);
+                return ms;
             }
         }
+
+        public static string GetMD5FromStream(Stream fs)
+        {
+            MD5 hash = MD5.Create();
+            fs.Position = 0;
+            var newHash = hash.ComputeHash(fs);
+            hash.Dispose();
+            return BitConverter.ToString(newHash).Replace("-", "").ToLower(); // Return the (updated) md5 as a string
+        }
+
     }
 
     public struct AAEmuNewsFeedLinksItem
@@ -231,6 +189,253 @@ namespace AAEmu.Launcher
         public AAEmuNewsFeedLinksItem links { get; set; }
     }
 
+    public class PakFileInfo
+    {
+        public string filePath;
+        public Int64 fileSize;
+        public string fileHash;
+        public FileSystemInfo fileInfo;
+    }
 
+    public enum PatchFase { Error, Init, DownloadVerFile, CompareVersion, CheckLocalFiles, ReHashLocalFiles, DownloadPatchFilesInfo, CalculateDownloads, DownloadFiles, AddFiles, Done };
+    public class AAPatchProgress
+    {
+        public PatchFase Fase = PatchFase.Init;
+        public string localVersion = "";
+        public string remoteVersionString = "";
+        public string remoteVersion = "";
+        public string remotePatchFileHash = "";
+        public string remotePatchSystemVersion = "0";
+        public string localGame_Pak = "";
+        public string localGameFolder = "";
+        public string localPatchDirectory = ".patch\\";
+        public string ErrorMsg = "NO_ERROR";
+        public string DoneMsg = "";
+        public List<PakFileInfo> localPakFileList = new List<PakFileInfo>();
+        public List<PakFileInfo> remotePakFileList = new List<PakFileInfo>();
+
+        public Int64 FileDownloadSizeTotal = 0;
+        public Int64 FileDownloadSizeDownloaded = 0;
+        public Int64 FileApplySize = 0;
+
+        public void Init(string ArcheAgeExeLocation)
+        {
+            Fase = PatchFase.Init;
+            remotePatchSystemVersion = "0";
+            localVersion = "";
+            remoteVersion = "";
+            localGameFolder = Path.GetDirectoryName(Path.GetDirectoryName(ArcheAgeExeLocation)) + Path.DirectorySeparatorChar;
+            localGame_Pak = localGameFolder + "game_pak";
+            localPatchDirectory = localGameFolder + ".patch" + Path.DirectorySeparatorChar;
+            localPakFileList = new List<PakFileInfo>();
+            remotePakFileList = new List<PakFileInfo>();
+
+            FileDownloadSizeTotal = 0;
+            FileDownloadSizeDownloaded = 0;
+            FileApplySize = 0;
+            ErrorMsg = "NO_ERROR";
+            DoneMsg = "";
+        }
+
+        public void RecalculateTotalDownloadSize()
+        {
+            Int64 c = 0;
+            for (int i = 0; i < remotePakFileList.Count; i++)
+            {
+                c += remotePakFileList[i].fileSize;
+            }
+            FileDownloadSizeTotal = c;
+        }
+
+        public bool SetRemoteVersionByString(string verStr)
+        {
+            string[] strItems = verStr.Split(';');
+            if (strItems.Length >= 3) // Only check if 3 or more, might extend later versions
+            {
+                // Primitive check for size mismatch
+                if ((strItems[0].Length != 15) || (strItems[1].Length != 32))
+                {
+                    return false;
+                }
+                remoteVersion = strItems[0];
+                remotePatchFileHash = strItems[1];
+                remotePatchSystemVersion = strItems[2];
+                return true;
+            }
+            return false;
+        }
+
+        public bool SetLocalVersionByString(string verStr)
+        {
+            string[] strItems = verStr.Split(';');
+            if (strItems.Length >= 3) // Only check if 3 or more, might extend later versions, only first is used for local patch info
+            {
+                // Primitive check for size mismatch
+                if ((strItems[0].Length != 15))
+                {
+                    return false;
+                }
+                localVersion = strItems[0];
+                return true;
+            }
+            return false;
+        }
+
+        public int GetDownloadProgressPercent()
+        {
+            long p = FileDownloadSizeDownloaded * 100 / FileDownloadSizeTotal;
+            return (int)p;
+        }
+
+        public static string DateTimeToPAtchDateTimeStr(DateTime aTime)
+        {
+            string res = "";
+            try
+            {
+                res = aTime.ToString("yyyyMMdd-HHmmss");
+            }
+            catch
+            {
+                res = "00000000-000000";
+            }
+            return res;
+        }
+
+        public static long PatchDateTimeStrToFILETIME(string encodedString)
+        {
+            long res = 0;
+
+            int yyyy = 0;
+            int mm = 0;
+            int dd = 0;
+            int hh = 0;
+            int nn = 0;
+            int ss = 0;
+
+            try
+            {
+                if (!int.TryParse(encodedString.Substring(0, 4), out yyyy)) yyyy = 0;
+                if (!int.TryParse(encodedString.Substring(4, 2), out mm)) mm = 0;
+                if (!int.TryParse(encodedString.Substring(6, 2), out dd)) dd = 0;
+                if (!int.TryParse(encodedString.Substring(9, 2), out hh)) hh = 0;
+                if (!int.TryParse(encodedString.Substring(11, 2), out nn)) nn = 0;
+                if (!int.TryParse(encodedString.Substring(13, 2), out ss)) ss = 0;
+
+                res = (new DateTime(yyyy, mm, dd, hh, nn, ss)).ToFileTime();
+            }
+            catch
+            {
+                res = 0;
+            }
+            return res;
+        }
+
+    }
+
+    public class FileAssociation
+    {
+        public string Extension { get; set; }
+        public string ProgId { get; set; }
+        public string FileTypeDescription { get; set; }
+        public string ExecutableFilePath { get; set; }
+    }
+
+
+    // source: https://stackoverflow.com/questions/2681878/associate-file-extension-with-application
+    public class FileAssociations
+    {
+        // needed so that Explorer windows get refreshed after the registry is updated
+        [System.Runtime.InteropServices.DllImport("Shell32.dll")]
+        private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
+
+        private const int SHCNE_ASSOCCHANGED = 0x8000000;
+        private const int SHCNF_FLUSH = 0x1000;
+
+        public static void EnsureAssociationsSet()
+        {
+            var filePath = Process.GetCurrentProcess().MainModule.FileName;
+            EnsureAssociationsSet(
+                new FileAssociation
+                {
+                    Extension = ".aelcf",
+                    ProgId = "AAEmu_Launcher_Config",
+                    FileTypeDescription = "ArcheAge Emu Launcher Configuration File",
+                    ExecutableFilePath = filePath
+                });
+        }
+
+        public static void EnsureURIAssociationsSet()
+        {
+            var filePath = Process.GetCurrentProcess().MainModule.FileName;
+            SetURIAssociation("aelcf", "AAEmu Launcher Protocol", filePath);
+        }
+
+        public static void EnsureAssociationsSet(params FileAssociation[] associations)
+        {
+            bool madeChanges = false;
+            foreach (var association in associations)
+            {
+                madeChanges |= SetAssociation(
+                    association.Extension,
+                    association.ProgId,
+                    association.FileTypeDescription,
+                    association.ExecutableFilePath);
+            }
+
+            if (madeChanges)
+            {
+                SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_FLUSH, IntPtr.Zero, IntPtr.Zero);
+            }
+        }
+
+        public static bool SetAssociation(string extension, string progId, string fileTypeDescription, string applicationFilePath)
+        {
+            bool madeChanges = false;
+            madeChanges |= SetKeyDefaultValue(@"Software\Classes\" + extension, progId);
+            madeChanges |= SetKeyDefaultValue(@"Software\Classes\" + progId, fileTypeDescription);
+            madeChanges |= SetKeyDefaultValue($@"Software\Classes\{progId}\shell\open\command", "\"" + applicationFilePath + "\" \"%1\"");
+            return madeChanges;
+        }
+
+        private static bool SetKeyDefaultValue(string keyPath, string value)
+        {
+            using (var key = Registry.CurrentUser.CreateSubKey(keyPath))
+            {
+                if (key.GetValue(null) as string != value)
+                {
+                    key.SetValue(null, value);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool SetKeyValue(string keyPath, string keyName, string value)
+        {
+            using (var key = Registry.CurrentUser.CreateSubKey(keyPath))
+            {
+                if (key.GetValue(keyName) as string != value)
+                {
+                    key.SetValue(keyName, value);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool SetURIAssociation(string protocolID, string protocolName, string applicationFilePath)
+        {
+            bool madeChanges = false;
+            madeChanges |= SetKeyDefaultValue(@"Software\Classes\" + protocolID, "URL:"+protocolName);
+            madeChanges |= SetKeyValue(@"Software\Classes\" + protocolID, "URL PRotocol", "");
+            madeChanges |= SetKeyDefaultValue(@"Software\Classes\" + protocolID + @"\DefaultIcon", "\"" + applicationFilePath+",1\"");
+            madeChanges |= SetKeyDefaultValue(@"Software\Classes\" + protocolID + @"\shell\open\command", "\"" + applicationFilePath + "\" \"%1\"");
+            return madeChanges;
+        }
+
+
+    }
 
 }

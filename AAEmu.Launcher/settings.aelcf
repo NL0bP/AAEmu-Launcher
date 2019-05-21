@@ -9,11 +9,13 @@
   "hideSplashLogo": "False",
   "lastLoginUser": "test",
   "lastLoginPass": "test",
-  "loginType": "mailru_1_0",
+  "loginType": "trino_1_2",
   "updateLocale": "True",
   "allowGameUpdates": "False",
   "serverGameUpdateURL": "",
   "serverWebsiteURL": "https://aaemu.info/",
   "serverNewsFeedURL": "",
+  "serverDiscordURL": "",
+  "serverDiscordName": "",
   "userHistory": [ "test" ]
 }
