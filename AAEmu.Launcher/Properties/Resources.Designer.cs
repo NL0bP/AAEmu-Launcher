@@ -63,9 +63,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap background {
+        internal static System.Drawing.Bitmap aaemu_logo {
             get {
-                object obj = ResourceManager.GetObject("background", resourceCulture);
+                object obj = ResourceManager.GetObject("aaemu_logo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap btn_conf {
+        internal static System.Drawing.Bitmap bg {
             get {
-                object obj = ResourceManager.GetObject("btn_conf", resourceCulture);
+                object obj = ResourceManager.GetObject("bg", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap btn_conf_a {
+        internal static System.Drawing.Bitmap bg_login {
             get {
-                object obj = ResourceManager.GetObject("btn_conf_a", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_login", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap btn_pickup {
+        internal static System.Drawing.Bitmap bg_newsfeed {
             get {
-                object obj = ResourceManager.GetObject("btn_pickup", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_newsfeed", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap btn_pickup_a {
+        internal static System.Drawing.Bitmap bg_patch {
             get {
-                object obj = ResourceManager.GetObject("btn_pickup_a", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_patch", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +113,34 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap btn_portal_exit {
+        internal static System.Drawing.Bitmap bg_setup {
             get {
-                object obj = ResourceManager.GetObject("btn_portal_exit", resourceCulture);
+                object obj = ResourceManager.GetObject("bg_setup", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to iVBORw0KGgoAAAANSUhEUgAAAMkAAAC3CAYAAAC47nq0AAAH13pUWHRSYXcgcHJvZmlsZSB0eXBl
+        ///IGV4aWYAAHjarVdprjQpDvzPKeYI2GDAx2GV+gZ9/Am2zHpLf1KP5qVeFQXGS4RtSNP//muY/+CP
+        ///hb3xElPQECz+vHrljEGy+29/k/Xrc/1VPWv0dd6UeBYYUw7fbv8M/chnzMu7IfozX77Om1iPnnQU
+        ///nYWr0E3LPF05Th5Fjvc8nd/mepr9Rzjn38Wl4hH+/ttHgNEEk44Nd0fO4nNuZAcPnLqMb7c+me+M
+        ///c4JPcvF37Mwz/AZe19+xs/lIuK9QGBuOQPiG0Zkn+R27hdCnR3SH/HWhhicJfmA3Rktj9B1d9gFI
+        ///BXOCskfFGkGwAEq3tgU8Ef+CcVyP4kkIsQL0BjYLnmpIiYH2IE+NMg3q67tShYueO0d8M1d2ay65
+        ///yMp1keLnQ4MjyGjGJXBVwZrDND++0LKry16lBMuNIMkE [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string bgnews_b64 {
+            get {
+                return ResourceManager.GetString("bgnews_b64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap bignews_default {
+            get {
+                object obj = ResourceManager.GetObject("bignews_default", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +148,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap btn_portal_exit_a {
+        internal static System.Drawing.Bitmap btn_green {
             get {
-                object obj = ResourceManager.GetObject("btn_portal_exit_a", resourceCulture);
+                object obj = ResourceManager.GetObject("btn_green", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +158,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap But_Lang_De {
+        internal static System.Drawing.Bitmap btn_green_a {
             get {
-                object obj = ResourceManager.GetObject("But_Lang_De", resourceCulture);
+                object obj = ResourceManager.GetObject("btn_green_a", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +168,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap But_Lang_En {
+        internal static System.Drawing.Bitmap btn_green_d {
             get {
-                object obj = ResourceManager.GetObject("But_Lang_En", resourceCulture);
+                object obj = ResourceManager.GetObject("btn_green_d", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,9 +178,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap But_Lang_Ru {
+        internal static System.Drawing.Bitmap btn_green_small {
             get {
-                object obj = ResourceManager.GetObject("But_Lang_Ru", resourceCulture);
+                object obj = ResourceManager.GetObject("btn_green_small", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,9 +188,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap But_Power {
+        internal static System.Drawing.Bitmap btn_red {
             get {
-                object obj = ResourceManager.GetObject("But_Power", resourceCulture);
+                object obj = ResourceManager.GetObject("btn_red", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -173,29 +198,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap But_Power_Active {
+        internal static System.Drawing.Bitmap btn_red_small {
             get {
-                object obj = ResourceManager.GetObject("But_Power_Active", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap But_Settings {
-            get {
-                object obj = ResourceManager.GetObject("But_Settings", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap But_Settings_Active {
-            get {
-                object obj = ResourceManager.GetObject("But_Settings_Active", resourceCulture);
+                object obj = ResourceManager.GetObject("btn_red_small", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -243,6 +248,116 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap flag_cn {
+            get {
+                object obj = ResourceManager.GetObject("flag_cn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_de {
+            get {
+                object obj = ResourceManager.GetObject("flag_de", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_english {
+            get {
+                object obj = ResourceManager.GetObject("flag_english", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_eu {
+            get {
+                object obj = ResourceManager.GetObject("flag_eu", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_fr {
+            get {
+                object obj = ResourceManager.GetObject("flag_fr", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_jp {
+            get {
+                object obj = ResourceManager.GetObject("flag_jp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_ko {
+            get {
+                object obj = ResourceManager.GetObject("flag_ko", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_ru {
+            get {
+                object obj = ResourceManager.GetObject("flag_ru", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_tw {
+            get {
+                object obj = ResourceManager.GetObject("flag_tw", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_us {
+            get {
+                object obj = ResourceManager.GetObject("flag_us", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap flag_xx {
+            get {
+                object obj = ResourceManager.GetObject("flag_xx", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap GitHub_Logo {
             get {
                 object obj = ResourceManager.GetObject("GitHub_Logo", resourceCulture);
@@ -283,9 +398,9 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Logo {
+        internal static System.Drawing.Bitmap mini_locale_cn {
             get {
-                object obj = ResourceManager.GetObject("Logo", resourceCulture);
+                object obj = ResourceManager.GetObject("mini_locale_cn", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -293,9 +408,79 @@ namespace AAEmu.Launcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Logo_Active {
+        internal static System.Drawing.Bitmap mini_locale_de {
             get {
-                object obj = ResourceManager.GetObject("Logo_Active", resourceCulture);
+                object obj = ResourceManager.GetObject("mini_locale_de", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap mini_locale_en_us {
+            get {
+                object obj = ResourceManager.GetObject("mini_locale_en_us", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap mini_locale_fr {
+            get {
+                object obj = ResourceManager.GetObject("mini_locale_fr", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap mini_locale_jp {
+            get {
+                object obj = ResourceManager.GetObject("mini_locale_jp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap mini_locale_kr {
+            get {
+                object obj = ResourceManager.GetObject("mini_locale_kr", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap mini_locale_ru {
+            get {
+                object obj = ResourceManager.GetObject("mini_locale_ru", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap pgbar_back {
+            get {
+                object obj = ResourceManager.GetObject("pgbar_back", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap pgbar_front {
+            get {
+                object obj = ResourceManager.GetObject("pgbar_front", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
