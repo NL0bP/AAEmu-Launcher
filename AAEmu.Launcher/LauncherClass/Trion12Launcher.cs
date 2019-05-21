@@ -25,9 +25,9 @@ namespace AAEmu.Launcher.Trion12
             // This fixed value was used by ToolsA when testing
             // var key = new byte[8] { 0x29, 0x6B, 0xD6, 0xEB, 0x2C, 0xA9, 0x03, 0x21 };
             // We use random values instead
-            encryptionKey = new byte[8];
-            Random r = new Random();
-            r.NextBytes(encryptionKey);
+            encryptionKey = new byte[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
+            //Random r = new Random();
+            //r.NextBytes(encryptionKey);
         }
 
         public override bool InitializeForLaunch()
@@ -175,6 +175,11 @@ namespace AAEmu.Launcher.Trion12
             Marshal.Copy(result, 0, pointer, result.Length);
             Win32.MemCpy(fileMapViewPointer, pointer, (uint)result.Length);
             Marshal.FreeHGlobal(pointer);
+
+            File.WriteAllBytes("ticket-txt.bin", ticketBytes);
+            File.WriteAllBytes("ticket-enc.bin", ticketEncrypted);
+            File.WriteAllBytes("ticket-key.bin", encryptionKey);
+            Win32.DumpMemFile((int)credentialFileMapHandle, "ticket-mem.bin");
 
             writer.Dispose();
             ms.Dispose();
