@@ -6,7 +6,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Diagnostics;
-using AAPacker;
 
 namespace AAEmu.Launcher.Basic
 {
@@ -202,81 +201,6 @@ namespace AAEmu.Launcher.Basic
         public string MinimumVersion;
         public string MinimumVersionForWorld;
         public DateTime MinimumWorldDate;
-    }
-
-    public class AAAutoDetectClient
-    {
-        static public string GuessLauncher(string archeAgeExeFile)
-        {
-            // Check if main exe and game_pak exist
-            if (!File.Exists(archeAgeExeFile))
-                return string.Empty;
-
-            var isArcheWorld = (archeAgeExeFile.ToLower().Contains("archeworld")) ;
-            var pakFileName = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(archeAgeExeFile)), "game_pak");
-            if (!File.Exists(pakFileName))
-                return string.Empty;
-
-            var res = string.Empty;
-            try
-            {
-                // Check by .exe version
-                var versionInfo = FileVersionInfo.GetVersionInfo(archeAgeExeFile);
-                string version = string.Join(".",versionInfo.FileVersion.Replace(" ","").Split(',')); // Will typically return "1.0.0.0" in your case
-
-                // Try detecting with version first
-                if (isArcheWorld || (string.Compare(version, "2.9") > 0))
-                {
-                    // For more recent versions, checking the .exe should be enough to be accurate
-                    var newestValidVersion = "";
-                    foreach (var aaLauncherContainer in AAEmuLauncherBase.AllLaunchers)
-                    {
-                        var compareVersion = isArcheWorld
-                            ? aaLauncherContainer.MinimumVersionForWorld
-                            : aaLauncherContainer.MinimumVersion;
-
-                        if (!string.IsNullOrWhiteSpace(compareVersion) && (string.Compare(version, compareVersion, true) > 0) && (string.Compare(version, newestValidVersion, true) > 0))
-                        {
-                            newestValidVersion = aaLauncherContainer.MinimumVersion;
-                            res = aaLauncherContainer.ConfigName;
-                        }
-                    }
-
-                }
-                
-                if (res == string.Empty)
-                {
-                    // For older versions, it's best to check inside the game_pak
-
-                    // Check by game_pak/game/worlds/main_world/world.xml 's create date
-                    var pak = new AAPak(pakFileName, true);
-                    var newestDateTimeFound = DateTime.MinValue;
-                    if (pak.GetFileByName("game/worlds/main_world/world.xml", out var worldInfo))
-                    {
-                        var worldTime = DateTime.FromFileTime(worldInfo.CreateTime);
-                        foreach (var aaLauncherContainer in AAEmuLauncherBase.AllLaunchers)
-                        {
-                            if (!isArcheWorld && !string.IsNullOrWhiteSpace(aaLauncherContainer.MinimumVersion) && (worldTime > newestDateTimeFound) && (newestDateTimeFound < aaLauncherContainer.MinimumWorldDate) && (worldTime > aaLauncherContainer.MinimumWorldDate))
-                            {
-                                newestDateTimeFound = aaLauncherContainer.MinimumWorldDate;
-                                res = aaLauncherContainer.ConfigName;
-                            }
-
-                            if (isArcheWorld && !string.IsNullOrWhiteSpace(aaLauncherContainer.MinimumVersionForWorld) && (worldTime > newestDateTimeFound) && (newestDateTimeFound < aaLauncherContainer.MinimumWorldDate) && (worldTime > aaLauncherContainer.MinimumWorldDate))
-                            {
-                                newestDateTimeFound = aaLauncherContainer.MinimumWorldDate;
-                                res = aaLauncherContainer.ConfigName;
-                            }
-                        }
-                    }
-                    pak.ClosePak();
-                }
-
-            }
-            catch { }
-
-            return res;
-        }
     }
 
     internal class Win32
@@ -518,6 +442,4 @@ namespace AAEmu.Launcher.Basic
             s[j] = c;
         }
     }
-
-
 }
