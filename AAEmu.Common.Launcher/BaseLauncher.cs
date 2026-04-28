@@ -9,6 +9,7 @@ using System.Diagnostics;
 
 namespace AAEmu.Launcher.Basic
 {
+    [AALauncher("","Base Launcher",0, "0.0","", "00000000")]
     public partial class AAEmuLauncherBase
     {
         public string UserName { get; set; }
@@ -24,21 +25,26 @@ namespace AAEmu.Launcher.Basic
         public string LaunchArguments { get; set; }
         public Process RunningProcess { get; protected set; }
         protected string _passwordHash { get; set; }
-        protected string LaunchVerb { get; set; }
+        public string LaunchVerb { get; set; }
+
+        protected bool SupportsArcheWorld { get; set; }
+
+        static public List<AALauncherContainer> AllLaunchers = new List<AALauncherContainer>();
 
         public AAEmuLauncherBase()
         {
-            UserName = "";
-            _passwordHash = "";
-            GameExeFilePath = "C:\\ArcheAge\\Working\\Bin32\\ArcheAge.exe";
-            LaunchArguments = "";
-            ExtraArguments = "";
-            HShieldArgs = "";
+            UserName = string.Empty;
+            _passwordHash = string.Empty;
+            GameExeFilePath = @"C:\ArcheAge\Working\Bin32\ArcheAge.exe";
+            LaunchArguments = string.Empty;
+            ExtraArguments = string.Empty;
+            HShieldArgs = string.Empty;
             LaunchVerb = "runas";
             LoginServerAdress = "127.0.0.1";
             LoginServerPort = 1237;
-            Locale = "";
+            Locale = string.Empty;
             RunningProcess = null;
+            SupportsArcheWorld = false;
         }
 
         /// <summary>
@@ -120,6 +126,86 @@ namespace AAEmu.Launcher.Basic
             return true;
         }
 
+        static public void RegisterLaunchers()
+        {
+            var types = from t in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+                        where t.GetCustomAttributes(typeof(AALauncherAttribute), false).Count() > 0
+                        select t;
+
+            AllLaunchers.Clear();
+
+            // process each type to force initialise it
+            foreach (var type in types)
+            {
+                var attribs = type.GetCustomAttributes(typeof(AALauncherAttribute), false);
+                foreach (AALauncherAttribute a in attribs)
+                {
+                    var nl = new AALauncherContainer();
+                    nl.ConfigName = a.ConfigName;
+                    nl.DisplayName = a.DisplayName;
+                    nl.MinimumVersion = a.MinimumVersion;
+                    nl.MinimumVersionForWorld = a.MinimumVersionForWorld;
+                    nl.MinimumWorldDate = a.MinimumWorldDate;
+                    nl.MinimumRevision = a.MinimumRevision;
+                    nl.LauncherClass = type;
+                    AllLaunchers.Add(nl);
+                }
+            }
+            
+        }
+
+    }
+
+    internal class AALauncherAttribute : Attribute
+    {
+        // Keep a variable internally ...
+        protected string _configName;
+        protected string _displayName;
+        protected string _minimumVersion;
+        protected string _minimumVersionForWorld;
+        private DateTime _minimumWorldDate;
+        protected ulong _minimumRevision;
+
+        public string ConfigName { get => _configName; set => _configName = value; }
+        public string DisplayName { get => _displayName; set => _displayName = value; }
+        public string MinimumVersion { get => _minimumVersion; set => _minimumVersion = value; }
+        public string MinimumVersionForWorld { get => _minimumVersionForWorld; set => _minimumVersionForWorld = value; }
+        public DateTime MinimumWorldDate { get => _minimumWorldDate; set => _minimumWorldDate = value; }
+        public ulong MinimumRevision { get => _minimumRevision; set => _minimumRevision = value; }
+
+        // The constructor is called when the attribute is set.
+        public AALauncherAttribute(string configName, string displayName, ulong minimumRevision, string minimumArcheAgeVersion, string minimumArcheWorldVersion, string minimumDateYYYYMMDD)
+        {
+            _configName = configName;
+            _displayName = displayName;
+            _minimumVersion = minimumArcheAgeVersion;
+            _minimumVersionForWorld = minimumArcheWorldVersion;
+            DateTime dt ;
+            try
+            {
+                var y = int.Parse(minimumDateYYYYMMDD.Substring(0, 4));
+                var m = int.Parse(minimumDateYYYYMMDD.Substring(4, 2));
+                var d = int.Parse(minimumDateYYYYMMDD.Substring(6, 2));
+                dt = new DateTime(y, m, d);
+            }
+            catch
+            {
+                dt = DateTime.MinValue;
+            }
+            _minimumWorldDate = dt;
+            _minimumRevision = minimumRevision;
+        }
+    }
+
+    public class AALauncherContainer
+    {
+        public Type LauncherClass;
+        public string ConfigName;
+        public string DisplayName;
+        public string MinimumVersion;
+        public string MinimumVersionForWorld;
+        public DateTime MinimumWorldDate;
+        public ulong MinimumRevision;
     }
 
     internal class Win32
@@ -361,6 +447,4 @@ namespace AAEmu.Launcher.Basic
             s[j] = c;
         }
     }
-
-
 }

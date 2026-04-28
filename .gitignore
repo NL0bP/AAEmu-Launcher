@@ -336,3 +336,6 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 AAEmu.Launcher/data/img*.bin
+
+.publish/
+example-files/shortcuts/aaemu-aafree-localhost.aelcf

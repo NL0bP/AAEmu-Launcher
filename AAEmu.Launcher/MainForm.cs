@@ -1,30 +1,20 @@
-﻿using System;
+﻿using AAEmu.Launcher.Basic;
+using AAEmu.Launcher.MailRu10;
+using AAEmu.Launcher.Trion12;
+using AAEmu.Launcher.Trion35;
+using AAEmu.Launcher.Trion60;
+using AAPacker;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System.Threading;
-using System.Security.AccessControl;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 using System.Net.Sockets;
-using AAEmu.Launcher.Basic;
-using AAEmu.Launcher.MailRu10;
-using AAEmu.Launcher.Trion12;
-using System.IO.MemoryMappedFiles;
-using AAPakEditor;
-using AAEmu.Launcher.Trion35;
-// using XLPakTool;
+using System.Text;
+using System.Windows.Forms;
 
 namespace AAEmu.Launcher
 {
@@ -33,79 +23,132 @@ namespace AAEmu.Launcher
     {
 
         const string urlCheckLauncherUpdate = "https://raw.githubusercontent.com/ZeromusXYZ/AAEmu-Launcher/master/update.ver";
-        const string AppVersion = "0.4.7.1";
+        string AppVersion = "?.?.?.?";
 
-        public partial class Settings
+        public enum ShowPanelType
         {
-            [JsonProperty("configName")]
-            public string configName { get; set; }
+            Login = 0,
+            Settings = 1,
+            UpdatePatch = 2,
+        }
 
-            [JsonProperty("lang")]
-            public string Lang { get; set; }
+        public enum LauncherOpenMode
+        {
+            Error,
+            DefaultConfigFile,
+            SpecifiedConfigFile,
+            OpenServerURI,
+        }
 
-            [JsonProperty("launcherLang")]
-            public string LauncherLang { get; set; }
+        public partial class LauncherFileSettings
+        {
+            [JsonProperty("configVersion", NullValueHandling = NullValueHandling.Ignore)]
+            public int ConfigVersion { get; set; } = 0;
 
-            [JsonProperty("pathToGame")]
-            public string PathToGame { get; set; }
+            [JsonProperty("configName", NullValueHandling = NullValueHandling.Ignore)]
+            public string ConfigName { get; set; } = string.Empty;
 
-            [JsonProperty("serverIPAddress")]
-            public string ServerIpAddress { get; set; }
+            [JsonProperty("lang", NullValueHandling = NullValueHandling.Ignore)]
+            public string Lang { get; set; } = settingsLangEN_US;
 
-            [JsonProperty("saveLoginAndPassword")]
-            public string SaveLoginAndPassword { get; set; }
+            [JsonProperty("launcherLang", NullValueHandling = NullValueHandling.Ignore)]
+            public string LauncherLang { get; set; } = settingsLangEN_US;
 
-            [JsonProperty("skipIntro")]
-            public string SkipIntro { get; set; }
+            [JsonProperty("pathToGame", NullValueHandling = NullValueHandling.Ignore)]
+            public string PathToGame { get; set; } = string.Empty;
 
-            [JsonProperty("hideSplashLogo")]
-            public string HideSplashLogo { get; set; }
+            [JsonProperty("serverIPAddress", NullValueHandling = NullValueHandling.Ignore)]
+            public string ServerIpAddress { get; set; } = "127.0.0.1";
 
-            [JsonProperty("lastLoginUser")]
-            public string LastLoginUser { get; set; }
+            [JsonProperty("saveLoginAndPassword", NullValueHandling = NullValueHandling.Ignore)]
+            public bool SaveLoginAndPassword { get; set; } = false;
 
-            [JsonProperty("lastLoginPass")]
-            public string LastLoginPass { get; set; }
+            [JsonProperty("skipIntro", NullValueHandling = NullValueHandling.Ignore)]
+            public bool SkipIntro { get; set; } = false;
 
-            [JsonProperty("loginType")]
-            public string ClientLoginType { get; set; }
+            [JsonProperty("hideSplashLogo", NullValueHandling = NullValueHandling.Ignore)]
+            public bool HideSplashLogo { get; set; } = false;
 
-            [JsonProperty("updateLocale")]
-            public string UpdateLocale { get; set; }
+            [JsonProperty("lastLoginUser", NullValueHandling = NullValueHandling.Ignore)]
+            public string LastLoginUser { get; set; } = string.Empty;
 
-            [JsonProperty("allowGameUpdates")]
-            public string AllowGameUpdates { get; set; }
+            [JsonProperty("lastLoginPass", NullValueHandling = NullValueHandling.Ignore)]
+            public string LastLoginPass { get; set; } = string.Empty;
 
-            [JsonProperty("serverGameUpdateURL")]
-            public string ServerGameUpdateURL { get; set; }
+            [JsonProperty("loginType", NullValueHandling = NullValueHandling.Ignore)]
+            public string ClientLoginType { get; set; } = stringTrino_1_2;
 
-            [JsonProperty("serverWebsiteURL")]
-            public string ServerWebSiteURL { get; set; }
+            [JsonProperty("updateLocale", NullValueHandling = NullValueHandling.Ignore)]
+            public bool UpdateLocale { get; set; } = true;
 
-            [JsonProperty("serverNewsFeedURL")]
-            public string ServerNewsFeedURL { get; set; }
+            [JsonProperty("allowGameUpdates", NullValueHandling = NullValueHandling.Ignore)]
+            public bool AllowGameUpdates { get; set; } = false;
 
-            [JsonProperty("serverDiscordURL")]
-            public string ServerDiscordURL { get; set; }
+            [JsonProperty("serverGameUpdateURL", NullValueHandling = NullValueHandling.Ignore)]
+            public string ServerGameUpdateURL { get; set; } = string.Empty;
 
-            [JsonProperty("serverDiscordName")]
-            public string ServerDiscordName { get; set; }
+            [JsonProperty("serverWebsiteURL", NullValueHandling = NullValueHandling.Ignore)]
+            public string ServerWebSiteURL { get; set; } = string.Empty;
 
-            [JsonProperty("userHistory")]
-            public List<string> UserHistory { get; set; }
+            [JsonProperty("serverNewsFeedURL", NullValueHandling = NullValueHandling.Ignore)]
+            public string ServerNewsFeedURL { get; set; } = string.Empty;
+
+            [JsonProperty("serverDiscordURL", NullValueHandling = NullValueHandling.Ignore)]
+            public string ServerDiscordURL { get; set; } = string.Empty;
+
+            [JsonProperty("serverDiscordName", NullValueHandling = NullValueHandling.Ignore)]
+            public string ServerDiscordName { get; set; } = string.Empty;
+
+            [JsonProperty("userHistory", NullValueHandling = NullValueHandling.Ignore)]
+            public List<string> UserHistory { get; set; } = new List<string>();
+
+            [JsonProperty("autoLaunch", NullValueHandling = NullValueHandling.Ignore)]
+            public bool AutoLaunch { get; set; } = false;
+
+
+            public LauncherFileSettings()
+            {
+                SetDefaultSettings(this);
+            }
+
+            public static void SetDefaultSettings(LauncherFileSettings setting)
+            {
+                if (setting == null)
+                    setting = new LauncherFileSettings();
+                setting.ConfigVersion = 0;
+                setting.ConfigName = "";
+                setting.Lang = settingsLangEN_US;
+                setting.LauncherLang = settingsLangEN_US;
+                setting.PathToGame = "";
+                setting.ServerIpAddress = "127.0.0.1";
+                setting.SaveLoginAndPassword = false;
+                setting.SkipIntro = false;
+                setting.HideSplashLogo = false;
+                setting.LastLoginUser = "";
+                setting.LastLoginPass = "";
+                setting.ClientLoginType = stringTrino_1_2;
+                setting.UpdateLocale = true;
+                setting.AllowGameUpdates = false;
+                setting.ServerGameUpdateURL = "";
+                setting.ServerWebSiteURL = ""; // "https://aaemu.info/api/articles";
+                setting.ServerNewsFeedURL = "";
+                setting.UserHistory = new List<string>();
+            }
+
         }
 
         public partial class ClientLookupHelper
         {
             [JsonProperty("serverName")]
-            public List<string> serverNames { get; set; }
+            public List<string> ServerNames { get; set; } = new List<string>();
 
             [JsonProperty("clientLocation")]
-            public List<string> clientLocations { get; set; }
+            public List<string> ClientLocations { get; set; } = new List<string>();
         }
 
         // Some strings for our language settings
         private const string settingsLangEN_US = "en_us"; // English US
+        private const string settingsLangEN_SG = "en_sg"; // English US
         private const string settingsLangRU = "ru"; // Russian
         private const string settingsLangDE = "de"; // German
         // unused for launcher
@@ -115,6 +158,7 @@ namespace AAEmu.Launcher
         private const string settingsLangJP = "ja"; // Japanese
         private const string settingsLangZH_CN = "zh_cn"; // Chinese simplified
         private const string settingsLangZH_TW = "zh_tw"; // Chinese traditional // Not sure how I'd do this with flags if ever
+        private const string settingsLangSE_SV = "se_sv"; // Swedish
 
         public partial class LanguageSettings
         {
@@ -360,31 +404,42 @@ namespace AAEmu.Launcher
 
             [JsonProperty("downloadlauncherupdate")]
             public string DownloadLauncherUpdate { get; set; }
+
+            [JsonProperty("troubleshootgame")]
+            public string TroubleshootGame { get;set; }
+
+            [JsonProperty("troubleshootlauncher")]
+            public string TroubleshootLauncher { get; set; }
+
+            [JsonProperty("defaultlocationwarning")]
+            public string DefaultLocationWarning { get; set; }
+
+            [JsonProperty("urigen")]
+            public string URIGen { get; set; }
         }
 
-
-        public Settings Setting = new Settings();
-        public Settings RemoteSetting = new Settings();
+        public LauncherFileSettings Setting = new LauncherFileSettings();
+        public LauncherFileSettings RemoteSetting = new LauncherFileSettings();
         public static LanguageSettings L = new LanguageSettings();
         public ClientLookupHelper ClientLookup = new ClientLookupHelper();
 
-        const string archeAgeEXE = "archeage.exe";
-        const string archeAgeSystemConfigFileName = "system.cfg";
-        const ushort defaultAuthPort = 1237;
-        const string launcherDefaultConfigFile = "settings.aelcf"; // .aelcf = ArcheAge Emu Launcher Configuration File
-        const string clientLookupDefaultFile = "clientslist.json";
-        const string remotePatchFolderURI = ".patch/";
-        const string patchListFileName = "patchfiles.csv";
-        const string patchVersionFileName = "patchfiles.ver";
-        const string localPatchPakFileName = "download.patch";
-        const string launcherProtocolSchema = "aelcf";
-        const string urlAAEmuGitHub = "https://github.com/atel0/AAEmu";
-        const string urlLauncherGitHub = "https://github.com/ZeromusXYZ/AAEmu-Launcher";
-        const string urlAAEmuDiscordInvite = "https://discord.gg/vn8E8E6";
-        const string urlLauncherDiscordInvite = "https://discord.gg/GhVfDtK";
-        const string urlNews = "https://aaemu.info/api/articles";
-        const string urlWebsite = "https://aaemu.info/";
-        const string dx9downloadURL = "https://www.microsoft.com/en-us/download/confirmation.aspx?id=35";
+        public static string archeAgeEXE = "archeage.exe";
+        public static string archeWorldEXE = "archeworld.exe";
+        public static string archeAgeSystemConfigFileName = "system.cfg";
+        public static ushort defaultAuthPort = 1237;
+        public static string launcherDefaultConfigFile = "settings.aelcf"; // .aelcf = ArcheAge Emu Launcher Configuration File
+        public static string clientLookupDefaultFile = "clientslist.json";
+        public static string remotePatchFolderURI = ".patch/";
+        public static string patchListFileName = "patchfiles.csv";
+        public static string patchVersionFileName = "patchfiles.ver";
+        public static string localPatchPakFileName = "download.patch";
+        public static string launcherProtocolSchema = "aelcf";
+        public static string urlAAEmuGitHub = "https://github.com/AAEmu/AAEmu";
+        public static string urlLauncherGitHub = "https://github.com/ZeromusXYZ/AAEmu-Launcher";
+        public static string urlAAEmuDiscordInvite = "https://discord.gg/vn8E8E6";
+        public static string urlLauncherDiscordInvite = "https://discord.gg/GhVfDtK";
+        public static string urlWebsite = "https://github.com/AAEmu/AAEmu"; // "https://aaemu.info/";
+        public static string dx9downloadURL = "https://www.microsoft.com/en-us/download/confirmation.aspx?id=35";
         string localPatchFolderName = ".patch" + Path.DirectorySeparatorChar;
         string URIConfigFileData = "";
         string URIConfigFileDataHost = "";
@@ -392,18 +447,20 @@ namespace AAEmu.Launcher
         string urlLauncherUpdateDownload = "";
         string LauncherUpdateVersion = "";
         bool checkedForLauncherUpdates = false;
+        public string DefaultGameWorkingDirectory = "";
 
 
         // launcher protocol indentifiers
         private const string stringMailRu_1_0 = "mailru_1_0";
         private const string stringTrino_1_2 = "trino_1_2";
         private const string stringTrino_3_5 = "trino_3_5";
+        private const string stringTrino_6_0 = "trino_6_0";
 
         // Stuff for dragable form
         private bool formMouseDown;
         private Point lastLocation;
 
-        private int currentPanel = 0;
+        private ShowPanelType currentPanel = ShowPanelType.Login;
         private int nextServerCheck = -1;
         enum serverCheck { Offline = 0, Online, Unknown, Update, Updating };
         private serverCheck serverCheckStatus = serverCheck.Unknown;
@@ -418,7 +475,15 @@ namespace AAEmu.Launcher
         private AAPatchProgress aaPatcher = new AAPatchProgress();
         private AAPak pak = null;
         private AAPak PatchDownloadPak = null;
-        private List<AAPakFileInfo> dlPakFileList = new List<AAPakFileInfo>();
+        // (PakFileInfo, Reason to Add)
+        private List<(AAPakFileInfo, string)> dlPakFileList = new List<(AAPakFileInfo, string)>();
+        private LauncherOpenMode AppOpenMode = LauncherOpenMode.DefaultConfigFile;
+
+        // Auto Close
+        public int AutoCloseTimer { get; set; } = 0;
+        public bool DoAutoLaunch { get; set; } = false;
+        private bool CancelPatching { get; set; } = false;
+
 
         public LauncherForm()
         {
@@ -513,21 +578,24 @@ namespace AAEmu.Launcher
             L.FixBin32Files = "Overwrite all files in {0} with the original files from {1} ?";
 
             L.DownloadLauncherUpdate = "Launcher Version {0} available, click to download";
+
+            L.TroubleshootGame = "Troubleshoot Game";
+            L.TroubleshootLauncher = "Troubleshoot Launcher";
+            L.DefaultLocationWarning = "It is not recommended to use the virtual default location, please locate the real location of the game executable instead. Do you want to use the current file anyway ?";
+            L.URIGen = "Generate Server URI Link";
         }
 
         private void LoadLanguageFromFile(string languageID)
         {
             bool res = false;
 
-            string lngFileName = Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar + "lng" + Path.DirectorySeparatorChar + languageID + ".lng";
+            string lngFileName = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath),"lng",languageID + ".lng");
 
             StreamReader reader = null;
-            //Console.WriteLine(lngFileName);
             try
             {
                 reader = new StreamReader(lngFileName);
                 var ConfigFile = reader.ReadToEnd();
-                //Console.Write(ConfigFile.ToString());
 
                 L = JsonConvert.DeserializeObject<LanguageSettings>(ConfigFile);
                 res = true;
@@ -551,9 +619,10 @@ namespace AAEmu.Launcher
 
         }
 
-        private void SetCustomCheckBox(Label targetLabel, string checkState)
+
+        private void SetCustomCheckBox(Label targetLabel, bool checkState)
         {
-            if (checkState == "True")
+            if (checkState)
             {
                 targetLabel.Text = "✓";
             }
@@ -561,6 +630,11 @@ namespace AAEmu.Launcher
             {
                 targetLabel.Text = " ";
             }
+        }
+
+        private void SetCustomCheckBox(Label targetLabel, string checkState)
+        {
+            SetCustomCheckBox(targetLabel, (checkState == "True"));
         }
 
         private string ToggleSettingCheckBox(Label targetLabel, string settingString)
@@ -579,32 +653,47 @@ namespace AAEmu.Launcher
             return s;
         }
 
-        private void ShowPanelControls(byte panelID)
+        private bool ToggleSettingCheckBox(Label targetLabel, bool isChecked)
+        {
+            bool s = false;
+            if (isChecked)
+            {
+                s = false;
+            }
+            else
+            {
+                s = true;
+            }
+            SetCustomCheckBox(targetLabel, s);
+            return s;
+        }
+
+        private void ShowPanelControls(ShowPanelType panelID)
         {
             // The reason for doing things this way is because drawing reliable transparent stuff
             // onto a panel is hard as hell. It's easier to just put EVERYTHING on the form, and
             // Just show/hide what you need (swapping out background where needed)
 
             // 0: Main login "panel"  and  2: Update/Patch "panel"
-            panelLoginAndPatch.Visible = ((panelID == 0) || (panelID == 2));
+            panelLoginAndPatch.Visible = ((panelID == ShowPanelType.Login) || (panelID == ShowPanelType.UpdatePatch));
             panelLoginAndPatch.Location = new Point(0, 0);
             panelLoginAndPatch.Size = this.Size;
-            eLogin.Visible = (panelID == 0);
-            ePassword.Visible = (panelID == 0);
-            lLogin.Visible = (panelID == 0);
-            lPassword.Visible = (panelID == 0);
-            lNewsFeed.Visible = ((panelID == 0) || (panelID == 2));
-            imgBigNews.Visible = (panelID == 0);
+            eLogin.Visible = (panelID == ShowPanelType.Login);
+            ePassword.Visible = (panelID == ShowPanelType.Login);
+            lLogin.Visible = (panelID == ShowPanelType.Login);
+            lPassword.Visible = (panelID == ShowPanelType.Login);
+            lNewsFeed.Visible = ((panelID == ShowPanelType.Login) || (panelID == ShowPanelType.UpdatePatch));
+            imgBigNews.Visible = (panelID == ShowPanelType.Login);
             cbLoginList.Visible = (cbLoginList.Items.Count > 0);
-            lBigNewsImage.Visible = ((panelID == 0) && (lBigNewsImage.Tag != null) && (lBigNewsImage.Tag.ToString() != ""));
-            wbNews.Visible = (((panelID == 0) || (panelID == 2)) && (wbNews.Tag != null) && (wbNews.Tag.ToString() == "1"));
-            lPatchProgressBarText.Visible = (panelID == 2);
-            pgbBackTotal.Visible = (panelID == 2);
-            pgbFrontTotal.Visible = (panelID == 2);
-            pPatchSteps.Visible = (panelID == 2);
+            lBigNewsImage.Visible = ((panelID == ShowPanelType.Login) && (lBigNewsImage.Tag != null) && (lBigNewsImage.Tag.ToString() != ""));
+            wbNews.Visible = (((panelID == ShowPanelType.Login) || (panelID == ShowPanelType.UpdatePatch)) && (wbNews.Tag != null) && (wbNews.Tag.ToString() == "1"));
+            lPatchProgressBarText.Visible = (panelID == ShowPanelType.UpdatePatch);
+            pgbBackTotal.Visible = (panelID == ShowPanelType.UpdatePatch);
+            pgbFrontTotal.Visible = (panelID == ShowPanelType.UpdatePatch);
+            pPatchSteps.Visible = (panelID == ShowPanelType.UpdatePatch);
 
             // 1: Settings "panel"
-            panelSettings.Visible = (panelID == 1);
+            panelSettings.Visible = (panelID == ShowPanelType.Settings);
             panelSettings.Location = new Point(0, 0);
             panelSettings.Size = this.Size;
             eServerIP.Enabled = (serverCheckStatus != serverCheck.Updating);
@@ -636,14 +725,14 @@ namespace AAEmu.Launcher
             // If we don't change this, transparancy effects that aren't on the panels will show wrong because of gray background
             switch (panelID)
             {
-                case 0:
+                case ShowPanelType.Login:
                     BackgroundImage = Properties.Resources.bg_login;
                     panelLoginAndPatch.BackgroundImage = Properties.Resources.bg_login;
                     break;
-                case 1:
+                case ShowPanelType.Settings:
                     BackgroundImage = Properties.Resources.bg_setup;
                     break;
-                case 2:
+                case ShowPanelType.UpdatePatch:
                     BackgroundImage = Properties.Resources.bg_patch;
                     panelLoginAndPatch.BackgroundImage = Properties.Resources.bg_patch;
                     break;
@@ -671,6 +760,15 @@ namespace AAEmu.Launcher
                 case settingsLangFR:
                     btnLauncherLangChange.Image = Properties.Resources.flag_fr;
                     break;
+                case settingsLangZH_TW:
+                    btnLauncherLangChange.Image = Properties.Resources.flag_traditional_chinese;
+                    break;
+                case settingsLangZH_CN:
+                    btnLauncherLangChange.Image = Properties.Resources.flag_cn;
+                    break;
+                case settingsLangSE_SV:
+                    btnLauncherLangChange.Image = Properties.Resources.flag_se_sv;
+                    break;
                 case settingsLangEN_US:
                 default:
                     Setting.LauncherLang = settingsLangEN_US;
@@ -691,10 +789,10 @@ namespace AAEmu.Launcher
             btnWebsite.Text = L.Website;
             lUpdateLocale.Text = L.UpdateLocale;
             lAllowUpdates.Text = L.AllowUpdates;
-            minimizeToolStripMenuItem.Text = L.Minimize;
-            closeToolStripMenuItem.Text = L.CloseProgram;
+            //minimizeToolStripMenuItem.Text = L.Minimize;
+            //closeToolStripMenuItem.Text = L.CloseProgram;
 
-            updatePlayButton(serverCheckStatus, false);
+            UpdatePlayButton(serverCheckStatus, false);
 
             rbInit.Text = L.Initialization;
             rbDownloadVerFile.Text = L.DownloadVerFile;
@@ -707,7 +805,6 @@ namespace AAEmu.Launcher
             rbAddFiles.Text = L.AddFiles;
             rbDone.Text = L.PatchDone;
 
-            troubleshootToolStripMenuItem.Text = L.TroubleShoot;
             debugModeToolStripMenuItem.Text = L.TSDebugMode;
             deleteShaderCacheToolStripMenuItem.Text = L.TSDeleteShaderCache;
             deleteGameConfigurationToolStripMenuItem.Text = L.TSDeleteGameSetting;
@@ -717,6 +814,10 @@ namespace AAEmu.Launcher
             fixBin32StripMenuItem.Text = L.TSFixBin32;
 
             lDownloadLauncherUpdate.Text = string.Format(L.DownloadLauncherUpdate, LauncherUpdateVersion);
+
+            troubleshootGameToolStripMenuItem.Text = L.TroubleshootGame;
+            troubleshootLauncherToolStripMenuItem.Text = L.TroubleshootLauncher;
+            generateServerURILinkToolStripMenuItem.Text = L.URIGen;
 
             btnLauncherLangChange.Refresh();
         }
@@ -742,34 +843,28 @@ namespace AAEmu.Launcher
                 case settingsLangJP:
                     btnLocaleLang.Image = Properties.Resources.mini_locale_jp;
                     break;
+                case settingsLangZH_TW:
+                    btnLocaleLang.Image = Properties.Resources.mini_locale_traditional_chinese;
+                    break;
+                case settingsLangZH_CN:
+                    btnLocaleLang.Image = Properties.Resources.mini_locale_cn;
+                    break;
                 case settingsLangEN_US:
-                default:
                     Setting.Lang = settingsLangEN_US;
                     btnLocaleLang.Image = Properties.Resources.mini_locale_en_us;
                     break;
+                case settingsLangEN_SG:
+                    Setting.Lang = settingsLangEN_SG;
+                    btnLocaleLang.Image = Properties.Resources.mini_locale_en_us;
+                    break;
+                default:
+                    //Setting.Lang = settingsLangEN_US;
+                    btnLocaleLang.Image = Properties.Resources.mini_locale_unknown;
+                    break;
             }
+            ttLocale.SetToolTip(btnLocaleLang, Setting.Lang);
 
             btnLocaleLang.Refresh();
-        }
-
-
-        private void PicButLangChange_Click(object sender, EventArgs e)
-        {
-            switch (Setting.LauncherLang)
-            {
-                case settingsLangRU:
-                    Setting.LauncherLang = settingsLangEN_US;
-                    break;
-                case settingsLangEN_US:
-                    Setting.LauncherLang = settingsLangDE;
-                    break;
-                case settingsLangDE:
-                    Setting.LauncherLang = settingsLangRU;
-                    break;
-            }
-            //Console.WriteLine("Updating Language: {0}",Setting.LauncherLang);
-            ApplyLanguageToLauncher();
-            btnLauncherLangChange.Refresh();
         }
 
         private void PicButGithub_MouseEnter(object sender, EventArgs e)
@@ -824,18 +919,57 @@ namespace AAEmu.Launcher
             }
         }
 
+        public bool IsInDefaultLocation(string exeFile)
+        {
+            return exeFile.ToLower().StartsWith(DefaultGameWorkingDirectory.ToLower());
+        }
+
         private void LauncherForm_Load(object sender, EventArgs e)
         {
+            // Grab my own version number from the assembly
+            try
+            {
+                var AppVer = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                string v = "";
+                v += AppVer.Major.ToString();
+                v += "." + AppVer.Minor.ToString();
+                if ((AppVer.Build > 0) || (AppVer.MinorRevision > 0))
+                    v += "." + AppVer.Build.ToString();
+                if (AppVer.MinorRevision > 0)
+                    v += "." + AppVer.MinorRevision.ToString();
+                AppVersion = v;
+            }
+            catch
+            {
+                AppVersion = "0.0.0.0";
+            }
             lAppVersion.Text = "V " + AppVersion;
+
+            // Default install working folder is C:\ArcheAge\Working
+            DefaultGameWorkingDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "ArcheAge", "Working");
             Application.UseWaitCursor = true;
+
+            // Register File Extensions to the Launcher
             RegisterFileExt();
-            SetDefaultSettings();
+
+            // Register All Launchers
+            AAEmuLauncherBase.RegisterLaunchers();
+            // Add them to the popup menu for launcher types
+            foreach (var l in AAEmuLauncherBase.AllLaunchers)
+                if (l.ConfigName != string.Empty)
+                    cmsAuthType.Items.Add(l.DisplayName, null, stAuthAuto_Click);
+
+            // Load application settings
+            LauncherFileSettings.SetDefaultSettings(Setting);
+            // Load default language
             InitDefaultLanguage();
 
             // Helps to keep the editing window cleaner
             imgBigNews.SizeMode = PictureBoxSizeMode.Normal;
             imgBigNews.Size = imgBigNews.Image.Size;
             imgBigNews.Invalidate();
+
+            AppOpenMode = LauncherOpenMode.DefaultConfigFile;
 
             string openCommandLineSettingsFile = "";
             string openCommandLineURISettings = "";
@@ -846,22 +980,24 @@ namespace AAEmu.Launcher
                 if (File.Exists(arg) && (arg != Application.ExecutablePath))
                 {
                     openCommandLineSettingsFile = arg;
+                    AppOpenMode = LauncherOpenMode.SpecifiedConfigFile;
                 }
                 else
                 {
                     if (arg.StartsWith(launcherProtocolSchema + "://"))
+                    {
                         openCommandLineURISettings = arg;
+                        AppOpenMode = LauncherOpenMode.OpenServerURI;
+                    }
                 }
             }
 
+            // Load the saved clients reference file
             LoadClientLookup();
 
-            // Load settings from URI (if present)
-            URIConfigFileData = "";
-            if ((openCommandLineSettingsFile == "") && (openCommandLineURISettings != ""))
+            // Try URI Mode if selected
+            if (AppOpenMode == LauncherOpenMode.OpenServerURI)
             {
-                // var stripProtocol = openCommandLineURISettings.Substring(launcherProtocol.Length);
-
                 try
                 {
                     Uri u = new Uri(openCommandLineURISettings);
@@ -871,45 +1007,106 @@ namespace AAEmu.Launcher
                         URIConfigFileData = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(encodedPath));
                     URIConfigFileDataHost = u.Host;
 
-                    // MessageBox.Show("Schema: " + u.Scheme + "\r\n" + "Host: " + u.Host + "\r\n" + "UserInfo: " + u.UserInfo + "\r\n" + "Path: " + u.AbsolutePath + "\r\n" + "Data: " + URIConfigFileData, "Open from URI", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LauncherFileSettings.SetDefaultSettings(Setting);
+                    Setting.ServerIpAddress = u.Host;
+                    Setting.ConfigName = u.Host;
+                    if (u.UserInfo != string.Empty)
+                    {
+                        var userinfo = u.UserEscaped ? u.UserInfo : Uri.UnescapeDataString(u.UserInfo);
+                        Setting.LastLoginUser = userinfo;
+                        Setting.LastLoginPass = string.Empty;
+                    }
+                    bool isEncoded = false;
+                    foreach(var seg in u.Segments)
+                    {
+                        var s = Uri.UnescapeDataString(seg);
+                        if (s.Length <= 1)
+                            continue;
+                        var option = s.Substring(0,1);
+                        var val = s.Substring(1);
+                        val = val.TrimEnd('/');
+                        if (isEncoded)
+                            val = UTF8Encoding.UTF8.GetString(Convert.FromBase64String(val));
+                        switch(option)
+                        {
+                            case "A":
+                                isEncoded = !isEncoded ;
+                                break;
+                            case "u": // User
+                                Setting.LastLoginUser = val;
+                                break;
+                            case "p": // Pass
+                                Setting.LastLoginPass = val;
+                                break;
+                            case "n": // Config Name to display
+                                Setting.ConfigName = val;
+                                break;
+                            case "a": // Authentication Type
+                                Setting.ClientLoginType = val; 
+                                break;
+                            case "w": // Website
+                                Setting.ServerWebSiteURL = val;
+                                break;
+                            case "f": // Newsfeed
+                                Setting.ServerNewsFeedURL = val;
+                                break;
+                            case "x": // Patch
+                                Setting.ServerGameUpdateURL = val;
+                                Setting.AllowGameUpdates = true;
+                                break;
+                        }
+                    }
+                    lLoadedConfig.Text = Setting.ConfigName;
+
+                    UpdatePanelLabels();
                 }
                 catch
                 {
                     URIConfigFileData = "";
                     openCommandLineURISettings = "";
+                    AppOpenMode = LauncherOpenMode.Error; // Revert to default
                 }
             }
 
-            if (URIConfigFileData != "")
+            if (AppOpenMode == LauncherOpenMode.SpecifiedConfigFile)
             {
-                if (!LoadSettingsFromString(URIConfigFileData, URIConfigFileDataHost)) URIConfigFileData = "";
+                if (!LoadSettingsFromFile(openCommandLineSettingsFile))
+                {
+                    openCommandLineSettingsFile = "";
+                    AppOpenMode = LauncherOpenMode.Error;
+                }
+
             }
 
-            if (openCommandLineSettingsFile != "")
-            {
-                if (!LoadSettingsFromFile(openCommandLineSettingsFile)) openCommandLineSettingsFile = "";
-            }
             // Load local settings file if no external config specified, or if it failed to load
-            if ((openCommandLineSettingsFile == "") && (URIConfigFileData == ""))
+            if (AppOpenMode == LauncherOpenMode.DefaultConfigFile)
             {
-                if (!LoadSettingsFromFile(Application.StartupPath + Path.DirectorySeparatorChar + launcherDefaultConfigFile))
-                    SetDefaultSettings();
+                if (!LoadSettingsFromFile(Path.Combine(Application.StartupPath,launcherDefaultConfigFile)))
+                {
+                    AppOpenMode = LauncherOpenMode.Error;
+                }
             }
 
-            if ((Setting.PathToGame == null) || (Setting.PathToGame == "") || (File.Exists(Setting.PathToGame) == false))
+            // In case of error, Default All The Things !
+            if (AppOpenMode == LauncherOpenMode.Error)
+            {
+                LauncherFileSettings.SetDefaultSettings(Setting);
+            }
+
+            if ((Setting.PathToGame == null) || (Setting.PathToGame == "") || !File.Exists(Setting.PathToGame))
             {
                 Setting.PathToGame = "";
                 TryAutoFindGameExe();
             }
 
-            if ((Setting.PathToGame == "") || (File.Exists(Setting.PathToGame) == false))
+            if ((Setting.PathToGame == "") || (!File.Exists(Setting.PathToGame)) || IsInDefaultLocation(Setting.PathToGame))
             {
                 // open settings if no valid game file
-                ShowPanelControls(1);
+                ShowPanelControls(ShowPanelType.Settings);
             }
             else
             {
-                ShowPanelControls(0);
+                ShowPanelControls(ShowPanelType.Login);
                 if (eLogin.Text != "")
                 {
                     ePassword.Focus();
@@ -940,28 +1137,29 @@ namespace AAEmu.Launcher
                 nextServerCheck = -1;
                 Application.UseWaitCursor = false;
             }
+            DoAutoLaunch = Setting.AutoLaunch;
+
+            UpdatePanelLabels();
         }
 
         private bool LoadClientLookup()
         {
             bool res = false;
-            string configFileName = Application.StartupPath + Path.DirectorySeparatorChar + clientLookupDefaultFile;
+            string configFileName = Path.Combine(Application.StartupPath,clientLookupDefaultFile);
 
             StreamReader reader = null;
-            // Console.WriteLine(configFileName);
             try
             {
                 reader = new StreamReader(configFileName);
                 var ConfigFile = reader.ReadToEnd();
-                // Console.Write(ConfigFile.ToString());
 
                 ClientLookup = JsonConvert.DeserializeObject<ClientLookupHelper>(ConfigFile);
                 res = true;
             }
             catch
             {
-                ClientLookup.serverNames = new List<string>();
-                ClientLookup.clientLocations = new List<string>();
+                ClientLookup.ServerNames = new List<string>();
+                ClientLookup.ClientLocations = new List<string>();
             }
             finally
             {
@@ -973,27 +1171,6 @@ namespace AAEmu.Launcher
             }
 
             return res;
-        }
-
-        private void SetDefaultSettings()
-        {
-            Setting.configName = "";
-            Setting.Lang = settingsLangEN_US;
-            Setting.LauncherLang = settingsLangEN_US;
-            Setting.PathToGame = "";
-            Setting.ServerIpAddress = "127.0.0.1";
-            Setting.SaveLoginAndPassword = "False";
-            Setting.SkipIntro = "False";
-            Setting.HideSplashLogo = "False";
-            Setting.LastLoginUser = "";
-            Setting.LastLoginPass = "";
-            Setting.ClientLoginType = stringTrino_1_2;
-            Setting.UpdateLocale = "False";
-            Setting.AllowGameUpdates = "False";
-            Setting.ServerGameUpdateURL = "";
-            Setting.ServerWebSiteURL = "http://aaemi.info/";
-            Setting.ServerNewsFeedURL = "";
-            Setting.UserHistory = new List<string>();
         }
 
         private bool LoadSettingsFromFile(string configFileName)
@@ -1015,12 +1192,12 @@ namespace AAEmu.Launcher
 
         private bool LoadSettingsFromString(string configDataString, string hostName)
         {
-            bool res = false;
+            bool res ;
             try
             {
                 var ms = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(configDataString));
                 ms.Position = 0;
-                res = LoadSettingsFromStream(ms, hostName + ".aelcf");
+                res = LoadSettingsFromStream(ms, hostName + ".aelcf",hostName);
                 ms.Dispose();
             }
             catch
@@ -1030,65 +1207,9 @@ namespace AAEmu.Launcher
             return res;
         }
 
-        private bool LoadSettingsFromStream(Stream aStream, string configFileName)
+        private void UpdatePanelLabels()
         {
-            bool res = false;
-
-            StreamReader reader = null;
-            try
-            {
-                reader = new StreamReader(aStream);
-                var ConfigFile = reader.ReadToEnd();
-                // Console.Write(ConfigFile.ToString());
-
-                Setting = JsonConvert.DeserializeObject<Settings>(ConfigFile);
-                res = true;
-
-                if (configFileName == Application.StartupPath + Path.DirectorySeparatorChar + launcherDefaultConfigFile)
-                {
-                    lLoadedConfig.Text = "";
-                }
-                else if ((Setting.configName == null) || (Setting.configName == ""))
-                {
-                    lLoadedConfig.Text = Path.GetFileNameWithoutExtension(configFileName);
-                }
-                else
-                {
-                    lLoadedConfig.Text = Setting.configName;
-                }
-            }
-            catch
-            {
-                lLoadedConfig.Text = "";
-                // If loading fails, just put in some defaults instead
-                Setting.configName = ""; // Local setting doesn't display a name
-                Setting.PathToGame = "";
-                Setting.ServerIpAddress = "127.0.0.1";
-                Setting.Lang = settingsLangEN_US;
-                Setting.LauncherLang = settingsLangEN_US;
-                Setting.SaveLoginAndPassword = "True";
-                Setting.SkipIntro = "False";
-                Setting.HideSplashLogo = "False";
-                Setting.LastLoginUser = "test";
-                Setting.LastLoginPass = "test";
-                Setting.UserHistory = new List<string>();
-                Setting.UserHistory.Clear();
-                Setting.ClientLoginType = stringTrino_1_2;
-                Setting.UpdateLocale = "False";
-                Setting.AllowGameUpdates = "False";
-                Setting.ServerGameUpdateURL = ""; // Not allowed without a server settings file by default
-                Setting.ServerWebSiteURL = urlWebsite; // default to aaemu.info
-                Setting.ServerNewsFeedURL = ""; // Not implemented yet
-            }
-            finally
-            {
-                // Make sure we close our stream so the file won't be in use when we need to save it
-                if (reader != null)
-                {
-                    reader.Close();
-                }
-            }
-
+            lLoadedConfig.Text = Setting.ConfigName;
             lGamePath.Text = Setting.PathToGame;
             eServerIP.Text = Setting.ServerIpAddress;
 
@@ -1098,15 +1219,7 @@ namespace AAEmu.Launcher
                     if (s != "")
                         cbLoginList.Items.Add(s);
 
-            eLogin.Text = Setting.LastLoginUser;
-            ePassword.Text = Setting.LastLoginPass;
-
-            if (((Setting.ServerGameUpdateURL == null)) || (Setting.ServerGameUpdateURL == ""))
-            {
-                Setting.AllowGameUpdates = "False";
-            }
-
-            updateGameClientTypeLabel();
+            UpdateGameClientTypeLabel();
 
             ApplyLanguageToLauncher();
             UpdateLocaleLanguage();
@@ -1116,8 +1229,109 @@ namespace AAEmu.Launcher
             SetCustomCheckBox(cbHideSplash, Setting.HideSplashLogo);
             SetCustomCheckBox(cbUpdateLocale, Setting.UpdateLocale);
             SetCustomCheckBox(cbAllowUpdates, Setting.AllowGameUpdates);
+        }
+
+        private bool LoadSettingsFromStream(Stream aStream, string configFileName, string defaultHost = "127.0.0.1")
+        {
+            bool res = false;
+            Setting.ServerIpAddress = defaultHost;
+
+            try
+            {
+                string ConfigFileData = "";
+                using (var reader = new StreamReader(aStream))
+                    ConfigFileData = reader.ReadToEnd();
+
+                Setting = JsonConvert.DeserializeObject<LauncherFileSettings>(ConfigFileData);
+
+                if (Setting == null)
+                    Setting = new LauncherFileSettings();
+
+                res = true;
+
+                if (configFileName == Path.Combine(Application.StartupPath, launcherDefaultConfigFile))
+                {
+                    lLoadedConfig.Text = "";
+                }
+                else if ((Setting.ConfigName == null) || (Setting.ConfigName == ""))
+                {
+                    lLoadedConfig.Text = Path.GetFileNameWithoutExtension(configFileName);
+                }
+                else
+                {
+                    lLoadedConfig.Text = Setting.ConfigName;
+                }
+            }
+            catch
+            {
+                lLoadedConfig.Text = "";
+                // If loading fails, just put in some defaults instead
+                LauncherFileSettings.SetDefaultSettings(Setting);
+                Setting.ServerIpAddress = defaultHost;
+            }
+
+            eLogin.Text = Setting.LastLoginUser;
+            ePassword.Text = Setting.LastLoginPass;
+
+            if (((Setting.ServerGameUpdateURL == null)) || (Setting.ServerGameUpdateURL == ""))
+            {
+                Setting.AllowGameUpdates = false;
+            }
+
+            UpdatePanelLabels();
 
             return res;
+        }
+
+        public AAEmuLauncherBase CreateLauncherByName(string configName)
+        {
+            AAEmuLauncherBase res = null;
+            foreach(var l in AAEmuLauncherBase.AllLaunchers)
+            {
+                if (l.ConfigName == configName)
+                {
+                    res = Activator.CreateInstance(l.LauncherClass) as AAEmuLauncherBase;
+                    break;
+                }
+            }
+            return res;
+        }
+
+        private string GuessDocumentsFolder(string archeAgeExe)
+        {
+            // Changes made base on suggestion by Giawriav using ChatGPT
+            // Also now just check for a trailing null char for valid strings
+            var defaultFolderName = "ArcheAge";
+            var allowedFolders = new List<string> { "archeage", "archeworld", "aaemu" };
+            var documentConfigFile = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "documents.folders");
+            if (File.Exists(documentConfigFile))
+                allowedFolders = File.ReadAllLines(documentConfigFile).Select(f => f.ToLower().Trim()).ToList();
+            var maxFolderSize = allowedFolders.Max(f => f.Length) + 4;
+            try
+            {
+                if (File.Exists(archeAgeExe))
+                {
+                    byte[] exeBytes = File.ReadAllBytes(archeAgeExe);
+                    for (int i = 0; i < exeBytes.Length - maxFolderSize; i++)
+                    {
+                        string chunk = Encoding.ASCII.GetString(exeBytes, i, maxFolderSize).ToLower();
+                        foreach (var folder in allowedFolders)
+                        {
+                            if (chunk.StartsWith(folder+'\0'))
+                            {
+                                return folder;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error reading exe: {ex.Message}");
+            }
+
+            // Fallback: use the exe file name
+            return Path.GetFileNameWithoutExtension(archeAgeExe) ?? defaultFolderName;
         }
 
         private void StartGame()
@@ -1140,13 +1354,8 @@ namespace AAEmu.Launcher
                         }
                     }
 
-                    // Mutex mutUser = new Mutex(false, "archeage_auth_ticket_event");
-                    // mutex name might be: archeage_auth_ticket_event
-
-                    if (Setting.SaveLoginAndPassword == "true")
+                    if (Setting.SaveLoginAndPassword)
                         SaveSettings();
-
-                    UpdateGameSystemConfigFile((Setting.UpdateLocale == "True"), Setting.Lang, (Setting.SkipIntro == "True"));
 
                     // Clean up previous instance
                     if (aaLauncher != null)
@@ -1155,50 +1364,46 @@ namespace AAEmu.Launcher
                         aaLauncher = null;
                     }
 
-                    switch (Setting.ClientLoginType)
+
+                    aaLauncher = CreateLauncherByName(Setting.ClientLoginType);
+                    if (aaLauncher == null)
                     {
-                        case stringTrino_1_2:
-                            // Trion style auth ticket with handles
-                            aaLauncher = new Trion_1_2_Launcher();
-                            break;
-                        case stringTrino_3_5:
-                            // Trion style auth ticket with handles and username
-                            aaLauncher = new Trion_3_5_Launcher();
-                            break;
-                        case stringMailRu_1_0:
-                            // Original style using uid and hashed password as token
-                            aaLauncher = new MailRu_1_0_Launcher();
-                            break;
-                        default:
-                            MessageBox.Show(L.UnknownLauncherProtocol, Setting.ClientLoginType);
-                            return;
+                        MessageBox.Show(string.Format(L.UnknownLauncherProtocol, Setting.ClientLoginType), "Launcher");
+                        return;
                     }
+
+                    UpdateGameSystemConfigFile(GuessDocumentsFolder(Setting.PathToGame), Setting.UpdateLocale, Setting.Lang, Setting.SkipIntro);
 
                     aaLauncher.UserName = eLogin.Text;
                     aaLauncher.SetPassword(ePassword.Text);
                     aaLauncher.LoginServerAdress = serverIP;
                     aaLauncher.LoginServerPort = serverPort;
                     aaLauncher.GameExeFilePath = Setting.PathToGame;
-                    // if (Setting.UpdateLocale == "True")
-                    aaLauncher.Locale = Setting.Lang;
+                    // if (Setting.UpdateLocale)
+                        aaLauncher.Locale = Setting.Lang;
                     aaLauncher.HShieldArgs = "+acpxmk";
 
-                    if (Setting.HideSplashLogo == "True")
+                    if (Setting.HideSplashLogo)
                         aaLauncher.ExtraArguments += "-nosplash";
 
                     aaLauncher.InitializeForLaunch();
 
                     if (debugModeToolStripMenuItem.Checked)
                     {
-                        DebugHelperForm dlg = new DebugHelperForm();
-                        dlg.eArgs.Text = aaLauncher.LaunchArguments;
-                        dlg.eHackShieldArg.Text = aaLauncher.HShieldArgs;
-                        if (dlg.ShowDialog() == DialogResult.OK)
+                        using (var dlg = new DebugHelperForm())
                         {
-                            aaLauncher.LaunchArguments = dlg.eArgs.Text;
-                            aaLauncher.HShieldArgs = dlg.eHackShieldArg.Text;
+                            dlg.eExe.Text = aaLauncher.GameExeFilePath;
+                            dlg.eArgs.Text = aaLauncher.LaunchArguments;
+                            dlg.eHackShieldArg.Text = aaLauncher.HShieldArgs;
+                            dlg.eVerb.Text = aaLauncher.LaunchVerb;
+                            if (dlg.ShowDialog() == DialogResult.OK)
+                            {
+                                aaLauncher.GameExeFilePath = dlg.eExe.Text;
+                                aaLauncher.LaunchArguments = dlg.eArgs.Text;
+                                aaLauncher.HShieldArgs = dlg.eHackShieldArg.Text;
+                                aaLauncher.LaunchVerb = dlg.eVerb.Text;
+                            }
                         }
-                        dlg.Dispose();
                     }
 
                     var startOK = aaLauncher.Launch();
@@ -1291,51 +1496,58 @@ namespace AAEmu.Launcher
 
         private void LauncherForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            CancelPatching = true;
             SaveSettings();
             try
             {
-                if (PatchDownloadPak != null)
-                    PatchDownloadPak.ClosePak();
+                PatchDownloadPak?.ClosePak();
             }
-            catch { }
+            catch
+            {
+                //
+            }
+
             try
             {
-                if (pak != null)
-                    pak.ClosePak();
+                pak?.ClosePak();
             }
-            catch { }
+            catch
+            {
+                //
+            }
         }
 
         private void SaveClientLookups()
         {
-            string configFileName = Application.StartupPath + Path.DirectorySeparatorChar + clientLookupDefaultFile;
+            var configFileName = Path.Combine(Application.StartupPath,clientLookupDefaultFile);
 
-            if ((Setting.configName != null) && (Setting.configName != ""))
+            if (!string.IsNullOrEmpty(Setting.ConfigName))
             {
                 string findExe = TryAutoFindFromLookup();
                 if ((findExe == "") && File.Exists(Setting.PathToGame))
                 {
-                    ClientLookup.serverNames.Add(Setting.configName);
-                    ClientLookup.clientLocations.Add(Setting.PathToGame);
+                    ClientLookup.ServerNames.Add(Setting.ConfigName);
+                    ClientLookup.ClientLocations.Add(Setting.PathToGame);
                 }
                 else
                 {
                     return;
                 }
-                var ClientLookupJson = JsonConvert.SerializeObject(ClientLookup, Formatting.Indented);
+                var clientLookupJson = JsonConvert.SerializeObject(ClientLookup, Formatting.Indented);
                 try
                 {
-                    File.WriteAllText(configFileName, ClientLookupJson);
+                    File.WriteAllText(configFileName, clientLookupJson);
                 }
                 catch
                 {
-                    //Console.Write("Unable to save client lookup data to :\n" + launcherOpenedConfigFile);
+                    // Unable to save client lookup data
                 }
             }
         }
 
         private void SaveSettings()
         {
+            Setting.ConfigVersion = 1;
             Setting.PathToGame = lGamePath.Text;
             // Try saving lookups after we set the path
             SaveClientLookups();
@@ -1345,7 +1557,7 @@ namespace AAEmu.Launcher
             // Setting.SkipIntro = cbSkipIntro.Checked.ToString();
             // Setting.HideSplashLogo = cbHideSplashLogo.Checked.ToString();
 
-            if (Setting.SaveLoginAndPassword == "True")
+            if (Setting.SaveLoginAndPassword)
             {
                 Setting.LastLoginUser = eLogin.Text;
                 // TODO: Save the password in a somewhat more safe way
@@ -1367,23 +1579,22 @@ namespace AAEmu.Launcher
             foreach (Object o in cbLoginList.Items)
                 Setting.UserHistory.Add(cbLoginList.GetItemText(o));
 
-            if (URIConfigFileData == "")
+            if (AppOpenMode != LauncherOpenMode.OpenServerURI)
             {
                 // Save settings to disk unless it was opened from a URI
-                var SettingJson = JsonConvert.SerializeObject(Setting, Formatting.Indented);
+                var SettingsJsonData = JsonConvert.SerializeObject(Setting, Formatting.Indented);
 
                 if ((launcherOpenedConfigFile == null) || (launcherOpenedConfigFile == "") || (File.Exists(launcherOpenedConfigFile) == false))
                 {
-                    launcherOpenedConfigFile = Application.StartupPath + Path.DirectorySeparatorChar + launcherDefaultConfigFile;
+                    launcherOpenedConfigFile = Path.Combine(Application.StartupPath,launcherDefaultConfigFile);
                 }
-                //Console.Write("Saving Settings to "+ launcherOpenedConfigFile +" :\n" + SettingJson);
                 try
                 {
-                    File.WriteAllText(launcherOpenedConfigFile, SettingJson);
+                    File.WriteAllText(launcherOpenedConfigFile, SettingsJsonData);
                 }
                 catch
                 {
-                    //Console.Write("Unable to save settings to :\n" + launcherOpenedConfigFile);
+                    // Unable to save settings
                 }
             }
         }
@@ -1439,17 +1650,17 @@ namespace AAEmu.Launcher
 
         private void btnPlay_MouseEnter(object sender, EventArgs e)
         {
-            updatePlayButton(serverCheckStatus, true);
+            UpdatePlayButton(serverCheckStatus, true);
         }
 
         private void btnPlay_MouseLeave(object sender, EventArgs e)
         {
-            updatePlayButton(serverCheckStatus, false);
+            UpdatePlayButton(serverCheckStatus, false);
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            ShowPanelControls(1); // Show settings
+            ShowPanelControls(ShowPanelType.Settings); // Show settings
         }
 
         private void btnWebsite_Click(object sender, EventArgs e)
@@ -1467,16 +1678,6 @@ namespace AAEmu.Launcher
         private void LauncherForm_BackgroundImageChanged(object sender, EventArgs e)
         {
             Invalidate(true);
-        }
-
-        private void minimizeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            WindowState = FormWindowState.Minimized;
-        }
-
-        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
         }
 
         private void btnSystem_Click(object sender, EventArgs e)
@@ -1504,9 +1705,27 @@ namespace AAEmu.Launcher
             }
             if (serverCheckStatus == serverCheck.Updating)
             {
-                ShowPanelControls(2);
+                ShowPanelControls(ShowPanelType.UpdatePatch);
             }
-            updatePlayButton(serverCheckStatus, false);
+            UpdatePlayButton(serverCheckStatus, false);
+        }
+
+        private void GuessAndUpdateClientType()
+        {
+            Application.UseWaitCursor = true;
+            using (var puf = new InfoPopupForm())
+            {
+                puf.lInfo.Text = "Detecting version, please wait ...";
+                puf.Show();
+                puf.Location = new Point(Location.X + ((Size.Width - puf.Size.Width) / 2), Location.Y + ((Size.Height - puf.Size.Height) / 2));
+                puf.Refresh();
+                var oldType = Setting.ClientLoginType;
+                Setting.ClientLoginType = AAAutoDetectClient.GuessLauncher(Setting.PathToGame);
+                UpdateGameClientTypeLabel();
+                if (oldType != Setting.ClientLoginType)
+                    lGameClientType.ForeColor = Color.Yellow;
+            }
+            Application.UseWaitCursor = false;
         }
 
         private void lGamePath_Click(object sender, EventArgs e)
@@ -1522,18 +1741,27 @@ namespace AAEmu.Launcher
             }
             if (openFileDialog.InitialDirectory == "")
             {
-                openFileDialog.InitialDirectory = "C:" + Path.DirectorySeparatorChar + "ArcheAge" + Path.DirectorySeparatorChar + "Working" + Path.DirectorySeparatorChar + "Bin32";
+                openFileDialog.InitialDirectory = Path.Combine(DefaultGameWorkingDirectory,"bin32");
             }
-            openFileDialog.Filter = "ArcheAge Game|" + archeAgeEXE + "|Executeable|*.exe|All files (*.*)|*.*";
+            openFileDialog.Filter = "ArcheAge|arche*.exe|ArcheAge Game|" + archeAgeEXE + "|ArcheWorld Game|" + archeWorldEXE + "| Executeable |*.exe|All files (*.*)|*.*";
             openFileDialog.FilterIndex = 1;
             openFileDialog.RestoreDirectory = true;
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            while (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                if (IsInDefaultLocation(openFileDialog.FileName))
+                {
+                    var res = MessageBox.Show(L.DefaultLocationWarning, L.PathToGame, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                    if (res == DialogResult.No)
+                        continue;
+                    if (res == DialogResult.Cancel)
+                        break;
+                }
                 //Get the path of specified file
                 Setting.PathToGame = openFileDialog.FileName;
                 lGamePath.Text = Setting.PathToGame;
-                // Console.WriteLine(openFileDialog.OpenFile());
+                GuessAndUpdateClientType();
+                break;
             }
         }
 
@@ -1563,27 +1791,23 @@ namespace AAEmu.Launcher
             Setting.UpdateLocale = ToggleSettingCheckBox(cbUpdateLocale, Setting.UpdateLocale);
         }
 
-        private void updateGameClientTypeLabel()
+        private void UpdateGameClientTypeLabel()
         {
-            switch (Setting.ClientLoginType)
-            {
-                case stringMailRu_1_0:
-                    lGameClientType.Text = "Mail.ru 1.0 Auth (-r)";
-                    break;
-                case stringTrino_1_2:
-                    lGameClientType.Text = "Trion 1.2 Auth (-t)";
-                    break;
-                case stringTrino_3_5:
-                    lGameClientType.Text = "Trion 3.5 Auth (-t)";
-                    break;
-                default:
-                    lGameClientType.Text = "???: " + Setting.ClientLoginType;
-                    break;
-            }
+            foreach (var l in AAEmuLauncherBase.AllLaunchers)
+                if (l.ConfigName == Setting.ClientLoginType)
+                {
+                    lGameClientType.Text = l.DisplayName;
+                    return;
+                }
+            lGameClientType.Text = "???: " + Setting.ClientLoginType;
+            lGameClientType.ForeColor = Color.White;
         }
 
         private void lGameClientType_Click(object sender, EventArgs e)
         {
+            if (sender is Label l)
+                cmsAuthType.Show(l, new Point(0,l.Height)); // Popup below
+            /*
             // toggle client types
             switch (Setting.ClientLoginType)
             {
@@ -1594,18 +1818,25 @@ namespace AAEmu.Launcher
                     Setting.ClientLoginType = stringTrino_3_5;
                     break;
                 case stringTrino_3_5:
+                    Setting.ClientLoginType = stringTrino_6_0;
+                    break;
+                case stringTrino_6_0:
                 default:
                     Setting.ClientLoginType = stringMailRu_1_0;
                     break;
             }
 
             updateGameClientTypeLabel();
+            */
         }
 
         private void ClearArcheAgeCache(bool clearShaders)
         {
             // C:\ArcheAge\Documents => UserHomeFolder\ArcheAge
-            string aaDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar + "ArcheAge" + Path.DirectorySeparatorChar;
+
+            var folder = File.Exists(Setting.PathToGame) ? GuessDocumentsFolder(Setting.PathToGame) : "ArcheAge";
+
+            string aaDocumentsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), folder);
 
             if (MessageBox.Show(L.DeleteShaderCache, L.DeleteShaderCacheTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
@@ -1621,10 +1852,13 @@ namespace AAEmu.Launcher
             }
         }
 
-        private void UpdateGameSystemConfigFile(bool enableUpdateLocale, string locale, bool enableSkipIntro)
+        private void UpdateGameSystemConfigFile(string documentsFolderName, bool enableUpdateLocale, string locale, bool enableSkipIntro)
         {
             // C:\ArcheAge\Documents => UserHomeFolder\ArcheAge
-            string configFileName = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar + "ArcheAge" + Path.DirectorySeparatorChar + archeAgeSystemConfigFileName;
+            var myDocsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            MessageBox.Show($"configFile: Path.Combine \n\"{myDocsFolder}\"\n\"{documentsFolderName}\"\n\"{archeAgeSystemConfigFileName}\"");
+            string configFileName = Path.Combine(myDocsFolder, documentsFolderName, archeAgeSystemConfigFileName);
+            MessageBox.Show($"configFile combined: \"{configFileName}\"");
             const string localeField = "locale = ";
             const string movieField = "login_first_movie = ";
             const string optionSoundField = "option_sound = ";
@@ -1715,13 +1949,16 @@ namespace AAEmu.Launcher
 
             try
             {
+                // Create the folder if needed
+                if (!Directory.Exists(Path.GetDirectoryName(configFileName)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(configFileName));
                 File.WriteAllLines(configFileName, newLines);
             }
-            catch
+            catch (Exception x)
             {
-                MessageBox.Show(L.ErrorUpdatingFile, configFileName);
+                MessageBox.Show(string.Format(L.ErrorUpdatingFile, configFileName)+"\n"+x.Message, "UpdateGameSystemConfigFile()");
             }
-
+            MessageBox.Show($"UpdateGameSystemConfigFile finished");
         }
 
         private void aAEmuServerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1742,12 +1979,12 @@ namespace AAEmu.Launcher
             }
             else
             {
-                Setting.AllowGameUpdates = "False";
+                Setting.AllowGameUpdates = false;
                 SetCustomCheckBox(cbAllowUpdates, Setting.AllowGameUpdates);
             }
         }
 
-        private string TryAutoFindInDir(string dirName, string fileName, int depth)
+        private string TryAutoFindInDir(string dirName, string[] fileNames, int depth)
         {
             pb1.PerformStep();
             pb1.Refresh();
@@ -1759,23 +1996,27 @@ namespace AAEmu.Launcher
             }
 
             DirectoryInfo di = new DirectoryInfo(dirName);
-            FileInfo[] files = di.GetFiles(fileName);
-            foreach (FileInfo fi in files)
+            foreach (var fileName in fileNames)
             {
-                if (fi.Name.ToLower() == fileName.ToLower() && (File.Exists(dirName + fi.Name)))
+                FileInfo[] files = di.GetFiles(fileName);
+                foreach (FileInfo fi in files)
                 {
-                    return dirName + fi.Name;
+                    if (fi.Name.ToLower() == fileName.ToLower() && (File.Exists(dirName + fi.Name)))
+                    {
+                        return dirName + fi.Name;
+                    }
                 }
-            }
 
-            DirectoryInfo[] dirs = di.GetDirectories();
-            pb1.Maximum = pb1.Maximum + dirs.Length;
-            foreach (DirectoryInfo downDir in dirs)
-            {
-                string dirRes = TryAutoFindInDir(dirName + downDir.Name + Path.DirectorySeparatorChar, fileName, depth + 1);
-                if (dirRes != "")
+                DirectoryInfo[] dirs = di.GetDirectories();
+                pb1.Maximum = pb1.Maximum + dirs.Length;
+                foreach (DirectoryInfo downDir in dirs)
                 {
-                    return dirRes;
+                    string dirRes = TryAutoFindInDir(dirName + downDir.Name + Path.DirectorySeparatorChar, fileNames,
+                        depth + 1);
+                    if (dirRes != "")
+                    {
+                        return dirRes;
+                    }
                 }
             }
 
@@ -1784,17 +2025,16 @@ namespace AAEmu.Launcher
 
         private string TryAutoFindFromLookup()
         {
-            if (ClientLookup.serverNames.Count != ClientLookup.clientLocations.Count)
+            if (ClientLookup.ServerNames.Count != ClientLookup.ClientLocations.Count)
             {
-                //Console.WriteLine("Error in client lookup file, array size mismatch ! Clearing settings");
-                ClientLookup.serverNames.Clear();
-                ClientLookup.clientLocations.Clear();
+                ClientLookup.ServerNames.Clear();
+                ClientLookup.ClientLocations.Clear();
             }
-            for (int i = 0; i < ClientLookup.serverNames.Count(); i++)
+            for (int i = 0; i < ClientLookup.ServerNames.Count(); i++)
             {
-                if (ClientLookup.serverNames[i] == Setting.configName)
+                if (ClientLookup.ServerNames[i] == Setting.ConfigName)
                 {
-                    return ClientLookup.clientLocations[i];
+                    return ClientLookup.ClientLocations[i];
                 }
             }
             return "";
@@ -1806,7 +2046,7 @@ namespace AAEmu.Launcher
 
             string exeFile = "";
 
-            if ((Setting.configName != null) && (Setting.configName != ""))
+            if ((Setting.ConfigName != null) && (Setting.ConfigName != ""))
             {
                 // If we loaded a named config, try to pick from a saved list first
                 exeFile = TryAutoFindFromLookup();
@@ -1841,7 +2081,8 @@ namespace AAEmu.Launcher
             // Let's put a big old try/catch around this to prevent any file system shananigans
             try
             {
-                exeFile = TryAutoFindInDir(configPath, archeAgeEXE, 0);
+                var fileNames = new string[] { archeAgeEXE, archeWorldEXE };
+                exeFile = TryAutoFindInDir(configPath, fileNames, 0);
                 if ((exeFile != "") && (File.Exists(exeFile)))
                 {
                     Setting.PathToGame = exeFile;
@@ -1856,7 +2097,7 @@ namespace AAEmu.Launcher
             Application.UseWaitCursor = false;
         }
 
-        private void updatePlayButton(serverCheck serverState, bool isMouseOver)
+        private void UpdatePlayButton(serverCheck serverState, bool isMouseOver)
         {
 
             if (isMouseOver == true)
@@ -1996,19 +2237,19 @@ namespace AAEmu.Launcher
                 {
                     nextServerCheck += 1000 * 60 * 1; // 1 minute
                     bgwServerStatusCheck.RunWorkerAsync(); // former checkServerStatus();
-                    updatePlayButton(serverCheckStatus, false);
+                    UpdatePlayButton(serverCheckStatus, false);
                 }
             }
 
             bool updateNews = false;
-            if ((bigNewsTimer > 0) && (currentPanel == 0)) // Only count timer on the main "panel"
+            if ((bigNewsTimer > 0) && (currentPanel == ShowPanelType.Login)) // Only count timer on the main "panel"
             {
                 bigNewsTimer -= timerGeneral.Interval;
                 if (bigNewsTimer <= 0)
                 {
-                    bigNewsTimer += 1000 * 10 * 1; // 1 minute
+                    bigNewsTimer += 1000 * 60 * 1; // 1 minute
                     bigNewsIndex++;
-                    if (bigNewsIndex >= newsFeed.data.Count)
+                    if (bigNewsIndex >= newsFeed.Data.Count)
                     {
                         bigNewsIndex = 0;
                     }
@@ -2022,6 +2263,16 @@ namespace AAEmu.Launcher
                 if (!bgwNewsFeed.IsBusy)
                 {
                     bgwNewsFeed.RunWorkerAsync();
+                }
+            }
+
+            if (AutoCloseTimer > 0)
+            {
+                AutoCloseTimer -= timerGeneral.Interval;
+                if (AutoCloseTimer <= 0)
+                {
+                    AutoCloseTimer = 0;
+                    Close();
                 }
             }
 
@@ -2091,6 +2342,12 @@ namespace AAEmu.Launcher
                 {
                     serverCheckStatus = serverCheck.Online;
                     nextServerCheck = (1000 * 60 * 2); // check every 2 minutes when connected
+                    if (DoAutoLaunch)
+                    {
+                        DoAutoLaunch = false;
+                        btnPlay_Click(null, null);
+                        AutoCloseTimer = (1000 * 10); // close after 10 seconds
+                    }
 
                 }
             }
@@ -2111,7 +2368,7 @@ namespace AAEmu.Launcher
                 }
             }
 
-            if (Setting.AllowGameUpdates == "True")
+            if (Setting.AllowGameUpdates)
             {
                 if ((Setting.ServerGameUpdateURL != null) && (Setting.ServerGameUpdateURL != "") && (aaPatcher.remoteVersion == ""))
                 {
@@ -2141,7 +2398,6 @@ namespace AAEmu.Launcher
         private void swapLanguageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Setting.LauncherLang = ((ToolStripMenuItem)sender).Tag.ToString();
-            //Console.WriteLine("Updating Language: {0}", Setting.LauncherLang);
             ApplyLanguageToLauncher();
             btnLauncherLangChange.Refresh();
         }
@@ -2153,7 +2409,7 @@ namespace AAEmu.Launcher
                 debugModeToolStripMenuItem.Checked = true;
                 debugModeToolStripMenuItem.Visible = true;
             }
-            troubleshootToolStripMenuItem.Visible = true;
+            troubleshootGameToolStripMenuItem.Visible = true;
         }
 
         private void debugModeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2169,7 +2425,7 @@ namespace AAEmu.Launcher
                 {
                     ToolStripMenuItem mi = (ToolStripMenuItem)tsi;
                     {
-                        mi.Enabled = (mi.Tag.ToString() != Setting.Lang);
+                        mi.Enabled = (mi.Tag?.ToString() != Setting.Lang);
                     }
                 }
             }
@@ -2179,7 +2435,6 @@ namespace AAEmu.Launcher
         private void miLocaleLanguageChange_Click(object sender, EventArgs e)
         {
             Setting.Lang = ((ToolStripMenuItem)sender).Tag.ToString();
-            //Console.WriteLine("Updating Locale Language: {0}", Setting.Lang);
             UpdateLocaleLanguage();
             btnLocaleLang.Refresh();
         }
@@ -2220,18 +2475,18 @@ namespace AAEmu.Launcher
             wns += "<body bgcolor=\"#000000\" text=\"#FFFFFF\"  link=\"#EEEEFF\"  vlink=\"#FFEEFF\" ";
             wns += "background =\"data:image/png;base64," + Properties.Resources.bgnews_b64 + "\">";
 
-            foreach (AAEmuNewsFeedDataItem i in newsFeed.data)
+            foreach (AAEmuNewsFeedDataItem i in newsFeed.Data)
             {
                 wns += "<p align=\"center\">";
-                if (i.itemAttributes.itemIsNew == "1")
+                if (i.ItemAttributes.ItemIsNew == "1")
                 {
                     wns += "*new* ";
                 }
-                wns += "<a href=\"" + i.itemAttributes.itemLinks.self + "\" target=\"_new\">";
-                wns += i.itemAttributes.itemTitle;
+                wns += "<a href=\"" + i.ItemAttributes.ItemLinks.Self + "\" target=\"_new\">";
+                wns += i.ItemAttributes.ItemTitle;
                 wns += "</a><br>";
                 wns += "<div align=\"left\"><font size=\"1\">";
-                var bodyStr = i.itemAttributes.itemBody;
+                var bodyStr = i.ItemAttributes.ItemBody;
                 if (bodyStr == null)
                     bodyStr = "";
                 wns += bodyStr.Replace("\\r", "").Replace("\\n", "<br>");
@@ -2243,7 +2498,7 @@ namespace AAEmu.Launcher
             wbNews.Refresh();
             // File.WriteAllText("newscache.htm",wns);
 
-            if ((newsFeed.data != null) && (newsFeed.data[0].itemAttributes.itemPicture != null) && (newsFeed.data[0].itemAttributes.itemPicture != ""))
+            if ((newsFeed.Data != null) && (newsFeed.Data[0].ItemAttributes.ItemPicture != null) && (newsFeed.Data[0].ItemAttributes.ItemPicture != ""))
             {
                 // LoadBigNews(newsFeed.data[0]);
                 // Move this to always load at the end of our newsfeed backgroundworker thread
@@ -2256,7 +2511,7 @@ namespace AAEmu.Launcher
         {
             string cacheFolder = Application.LocalUserAppDataPath + Path.DirectorySeparatorChar + "data";
             Directory.CreateDirectory(cacheFolder);
-            string cacheFileName = cacheFolder + Path.DirectorySeparatorChar + "img -" + Setting.configName.Replace("@", "_").Replace("/", "_").Replace("\\", "_").Replace("|", "_") + "-" + newsItem.itemID + ".bin";
+            string cacheFileName = cacheFolder + Path.DirectorySeparatorChar + "img -" + Setting.ConfigName.Replace("@", "_").Replace("/", "_").Replace("\\", "_").Replace("|", "_") + "-" + newsItem.ItemID + ".bin";
 
             MemoryStream imageData;
             Image img = null;
@@ -2272,7 +2527,7 @@ namespace AAEmu.Launcher
             {
                 try
                 {
-                    imageData = WebHelper.SimpleGetURIAsMemoryStream(newsItem.itemAttributes.itemPicture);
+                    imageData = WebHelper.SimpleGetURIAsMemoryStream(newsItem.ItemAttributes.ItemPicture, out _);
                     FileStream fs = new FileStream(cacheFileName, FileMode.Create);
                     imageData.WriteTo(fs);
                     fs.Flush();
@@ -2281,7 +2536,7 @@ namespace AAEmu.Launcher
                 }
                 catch
                 {
-                    // Console.WriteLine("Error loading " + newsItem.itemAttributes.itemPicture + " into " + cacheFileName);
+                    // Error loading " + newsItem.itemAttributes.itemPicture + " into " + cacheFileName
                 }
 
             }
@@ -2299,16 +2554,16 @@ namespace AAEmu.Launcher
                     imgBigNews.Image = img;
                     imgBigNews.SizeMode = PictureBoxSizeMode.Zoom;
 
-                    lBigNewsImage.Text = newsItem.itemAttributes.itemTitle;
-                    lBigNewsImage.Tag = newsItem.itemAttributes.itemLinks.self;
-                    lBigNewsImage.Visible = (currentPanel == 0);
+                    lBigNewsImage.Text = newsItem.ItemAttributes.ItemTitle;
+                    lBigNewsImage.Tag = newsItem.ItemAttributes.ItemLinks.Self;
+                    lBigNewsImage.Visible = (currentPanel == ShowPanelType.Login);
                 }
                 else
                 {
                     lBigNewsImage.Tag = "";
                     lBigNewsImage.Visible = false;
                     imgBigNews.Image = Properties.Resources.bignews_default;
-                    imgBigNews.Visible = (currentPanel == 0);
+                    imgBigNews.Visible = (currentPanel == ShowPanelType.Login);
                 }
             }
             catch
@@ -2316,14 +2571,14 @@ namespace AAEmu.Launcher
                 lBigNewsImage.Tag = "";
                 lBigNewsImage.Visible = false;
                 imgBigNews.Image = Properties.Resources.bignews_default;
-                imgBigNews.Visible = (currentPanel == 0);
+                imgBigNews.Visible = (currentPanel == ShowPanelType.Login);
             }
             Application.UseWaitCursor = false;
         }
 
         private void wbNews_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
-            wbNews.Visible = (currentPanel == 0);
+            wbNews.Visible = (currentPanel == ShowPanelType.Login);
             wbNews.Tag = "1"; // We use this it indicate if we need to show/hide the browser when swapping panels
         }
 
@@ -2346,7 +2601,7 @@ namespace AAEmu.Launcher
             // force the button to update
             serverCheckStatus = serverCheck.Update; // Patch
             nextServerCheck = -1;
-            updatePlayButton(serverCheckStatus, false);
+            UpdatePlayButton(serverCheckStatus, false);
             ShowPanelControls(0); // Update Panel (same as login but replaced news)
         }
 
@@ -2361,8 +2616,8 @@ namespace AAEmu.Launcher
         private void StartUpdate()
         {
             serverCheckStatus = serverCheck.Updating;
-            ShowPanelControls(2); // Swap to download layout
-            updatePlayButton(serverCheckStatus, false);
+            ShowPanelControls(ShowPanelType.UpdatePatch); // Swap to download layout
+            UpdatePlayButton(serverCheckStatus, false);
             bgwPatcher.RunWorkerAsync(); // start patch process
         }
 
@@ -2392,11 +2647,11 @@ namespace AAEmu.Launcher
                 }
             }
 
-            if ((bigNewsIndex >= 0) && (bigNewsIndex < newsFeed.data.Count))
+            if ((bigNewsIndex >= 0) && (bigNewsIndex < newsFeed.Data.Count))
             {
                 this.Invoke(new MethodInvoker(delegate
                 {
-                    LoadBigNews(newsFeed.data[bigNewsIndex]);
+                    LoadBigNews(newsFeed.Data[bigNewsIndex]);
                 }));
             }
             worker.ReportProgress(100);
@@ -2433,7 +2688,7 @@ namespace AAEmu.Launcher
 
         private void bgwServerStatusCheck_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            updatePlayButton(serverCheckStatus, false);
+            UpdatePlayButton(serverCheckStatus, false);
         }
 
         private List<AAPakFileInfo> CreateXlFileListFromStream(Stream aStream)
@@ -2451,36 +2706,36 @@ namespace AAEmu.Launcher
                     AAPakFileInfo xlfi = new AAPakFileInfo();
                     string[] items = line.Split(';');
                     // Path
-                    xlfi.name = items[0];
+                    xlfi.Name = items[0];
                     // Size
                     long l = 0;
                     if (long.TryParse(items[1], out l))
-                        xlfi.size = l;
+                        xlfi.Size = l;
                     else
-                        xlfi.size = 0;
+                        xlfi.Size = 0;
                     // If directory info
 
                     // Skip directories
-                    if (xlfi.size < 0)
+                    if (xlfi.Size < 0)
                         continue;
 
                     if (items.Length > 2)
                     {
-                        xlfi.md5 = StringToByteArray(items[2]);
+                        xlfi.Md5 = StringToByteArray(items[2]);
                     }
                     else
                     {
-                        xlfi.md5 = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+                        xlfi.Md5 = new byte[16] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
                     }
                     if (items.Length > 4)
                     {
-                        xlfi.createTime = AAPatchProgress.PatchDateTimeStrToFILETIME(items[3]);
-                        xlfi.modifyTime = AAPatchProgress.PatchDateTimeStrToFILETIME(items[4]);
+                        xlfi.CreateTime = AAPatchProgress.PatchDateTimeStrToFILETIME(items[3]);
+                        xlfi.ModifyTime = AAPatchProgress.PatchDateTimeStrToFILETIME(items[4]);
                     }
                     else
                     {
-                        xlfi.createTime = 0;
-                        xlfi.modifyTime = 0;
+                        xlfi.CreateTime = 0;
+                        xlfi.ModifyTime = 0;
                     }
                     res.Add(xlfi);
                 }
@@ -2499,7 +2754,7 @@ namespace AAEmu.Launcher
                     i = 0;
                 }
                 AAPakFileInfo pfi = list[i];
-                if (pfi.name.ToLower() == filename)
+                if (pfi.Name.ToLower() == filename)
                 {
                     startIndex = i;
                     return pfi;
@@ -2508,7 +2763,7 @@ namespace AAEmu.Launcher
             return null;
         }
 
-        private AAPakFileInfo FindPatchFileInSortedList(string filename, ref List<AAPakFileInfo> list)
+        private AAPakFileInfo FindPatchFileInSortedList(string filename, List<AAPakFileInfo> list)
         {
             filename = filename.ToLower();
             int searchMin = 0;
@@ -2523,7 +2778,7 @@ namespace AAEmu.Launcher
                 // searchPos = searchMin + (searchSize / 2);
                 searchPos = ((searchMin + searchMax) / 2);
 
-                var res = list[searchPos].name.CompareTo(filename);
+                var res = list[searchPos].Name.ToLower().CompareTo(filename);
                 if (res < 0)
                 {
                     // Looking for a smaller value
@@ -2561,6 +2816,36 @@ namespace AAEmu.Launcher
             return res;
         }
 
+
+        private string MakefileDownloadUrl(string filePath)
+        {
+            var dlFilePath = Setting.ServerGameUpdateURL;
+            // Realistically we only really need to handle a few special escapes for file paths
+            foreach (var c in filePath.ToCharArray())
+            {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == '.') || (c == '-') || (c == '_'))
+                {
+                    dlFilePath += c;
+                }
+                /*
+                else if (c == ' ')
+                {
+                    dlFilePath += '+';
+                }
+                */
+                else if ((c == '/') || (c == '\\'))
+                {
+                    dlFilePath += '/';
+                }
+                else
+                {
+                    dlFilePath += "%" + Convert.ToByte(c).ToString("X2");
+                }
+            }
+            // filePath = filePath.Replace(" ", "+").Replace("#", "%23");
+            return dlFilePath;
+        }
+        
         private void bgwPatcher_DoWork(object sender, DoWorkEventArgs e)
         {
             //------
@@ -2571,7 +2856,7 @@ namespace AAEmu.Launcher
             System.Threading.Thread.Sleep(150);
             try
             {
-                DirectoryInfo patchDirInfo = Directory.CreateDirectory(aaPatcher.localPatchDirectory);
+                _ = Directory.CreateDirectory(aaPatcher.localPatchDirectory);
             }
             catch
             {
@@ -2584,13 +2869,15 @@ namespace AAEmu.Launcher
 
             aaPatcher.Fase = PatchFase.DownloadVerFile;
             bgwPatcher.ReportProgress(0, aaPatcher);
+            if (CancelPatching)
+                return;
 
             // Download patch version file
             aaPatcher.remoteVersionString = WebHelper.SimpleGetURIAsString(Setting.ServerGameUpdateURL + remotePatchFolderURI + patchVersionFileName);
             if (!aaPatcher.SetRemoteVersionByString(aaPatcher.remoteVersionString))
             {
                 aaPatcher.Fase = PatchFase.Error;
-                aaPatcher.ErrorMsg = L.DownloadError + "\r\n" + Setting.ServerGameUpdateURL + remotePatchFolderURI + patchVersionFileName;
+                aaPatcher.ErrorMsg = L.DownloadError + "\r\n" + Setting.ServerGameUpdateURL + remotePatchFolderURI + patchVersionFileName ;
                 return;
             }
 
@@ -2603,6 +2890,8 @@ namespace AAEmu.Launcher
 
             aaPatcher.Fase = PatchFase.CompareVersion;
             System.Threading.Thread.Sleep(250);
+            if (CancelPatching)
+                return;
 
             //----------------------------------
             // Read Local version file (if any)
@@ -2624,6 +2913,8 @@ namespace AAEmu.Launcher
             }
 
             System.Threading.Thread.Sleep(250);
+            if (CancelPatching)
+                return;
 
             if (aaPatcher.localVersion == aaPatcher.remoteVersionString)
             {
@@ -2636,9 +2927,9 @@ namespace AAEmu.Launcher
             aaPatcher.Fase = PatchFase.CheckLocalFiles;
             bgwPatcher.ReportProgress(1, aaPatcher);
             System.Threading.Thread.Sleep(250);
+            if (CancelPatching)
+                return;
 
-            List<AAPakFileInfo> remotePakFileList;
-            List<AAPakFileInfo> rmPakFileList = new List<AAPakFileInfo>();
             dlPakFileList.Clear();
 
             //--------------------------------------
@@ -2649,8 +2940,14 @@ namespace AAEmu.Launcher
                 aaPatcher.Fase = PatchFase.CheckLocalFiles;
                 bgwPatcher.ReportProgress(2, aaPatcher);
 
-                pak = new AAPak(aaPatcher.localGame_Pak, false, false);
-                if (!pak.isOpen)
+                if (pak != null && pak.IsOpen)
+                    pak.ClosePak();
+
+                //pak = new AAPak(aaPatcher.localGame_Pak, false, false);
+                pak = new AAPak("");
+                TryLoadCustomKey(pak, aaPatcher.localGame_Pak);
+                pak.OpenPak(aaPatcher.localGame_Pak, false);
+                if (!pak.IsOpen)
                 {
                     // Failed to open pak
                     aaPatcher.Fase = PatchFase.Error;
@@ -2662,19 +2959,23 @@ namespace AAEmu.Launcher
                 // aaPatcher.FileDownloadSizeTotal = new System.IO.FileInfo(aaPatcher.localGame_Pak).Length;
                 aaPatcher.FileDownloadSizeTotal = 0;
                 var totalFilesCount = 0;
-                foreach (AAPakFileInfo pfi in pak.files)
+                foreach (var pfi in pak.Files)
                 {
-                    aaPatcher.FileDownloadSizeTotal += pfi.size;
+                    aaPatcher.FileDownloadSizeTotal += pfi.Size;
                     totalFilesCount++;
                 }
 
                 var filesCount = 0;
-                foreach (AAPakFileInfo pfi in pak.files)
+                foreach (var pfi in pak.Files)
                 {
-                    if (BitConverter.ToString(pfi.md5).Replace("-", "") == pak._header.nullHashString)
+                    //if (BitConverter.ToString(pfi.md5).Replace("-", "") == AAPakFileHeader.nullHashString)
+                    
+                    if (AAPakFileHeader.NullHash.SequenceEqual(pfi.Md5))
                     {
                         aaPatcher.Fase = PatchFase.ReHashLocalFiles;
-                        pak.UpdateMD5(pfi);
+                        pak.UpdateMd5(pfi);
+                        if (CancelPatching)
+                            return;
                     }
                     filesCount++;
                     if ((filesCount % 50) == 0)
@@ -2682,6 +2983,8 @@ namespace AAEmu.Launcher
                         bgwPatcher.ReportProgress((filesCount * 100 / totalFilesCount), aaPatcher);
                     }
                 }
+                if (CancelPatching)
+                    return;
 
                 if (aaPatcher.Fase == PatchFase.ReHashLocalFiles)
                     pak.SaveHeader();
@@ -2701,7 +3004,7 @@ namespace AAEmu.Launcher
             aaPatcher.Fase = PatchFase.DownloadPatchFilesInfo;
             bgwPatcher.ReportProgress(2, aaPatcher);
 
-            MemoryStream ms = WebHelper.SimpleGetURIAsMemoryStream(Setting.ServerGameUpdateURL + remotePatchFolderURI + patchListFileName);
+            var ms = WebHelper.SimpleGetURIAsMemoryStream(Setting.ServerGameUpdateURL + remotePatchFolderURI + patchListFileName, out _);
 
             // check if downloaded patch files list has the correct hash
             var remotePatchFilesHash = WebHelper.GetMD5FromStream(ms);
@@ -2713,9 +3016,11 @@ namespace AAEmu.Launcher
             }
 
             // Generate a files list in our pak files' format from the downloaded CSV
-            remotePakFileList = CreateXlFileListFromStream(ms);
+            var remotePakFileList = CreateXlFileListFromStream(ms);
 
             System.Threading.Thread.Sleep(250);
+            if (CancelPatching)
+                return;
 
             //--------------------------------------------------------------------------------------
             // Compare local game_pak with downloaded information to check what needs to be updated
@@ -2724,40 +3029,50 @@ namespace AAEmu.Launcher
             bgwPatcher.ReportProgress(0, aaPatcher);
 
             // First sort both to speed things up
-            pak.files.Sort();
             remotePakFileList.Sort();
+            pak.Files.Sort();
+
+            // Create lower-case copy of the files list for easy compare
+            var lowerCasePakFileNames = new Dictionary<string, AAPakFileInfo>();
+            foreach (var aaPakFileInfo in pak.Files)
+            {
+                lowerCasePakFileNames.Add(aaPakFileInfo.Name.ToLower(), aaPakFileInfo);
+            }
 
             long totSize = 0;
-            for (int i = 0; i < remotePakFileList.Count; i++)
+            for (var i = 0; i < remotePakFileList.Count; i++)
             {
-                AAPakFileInfo r = remotePakFileList[i];
+                var remoteFileInfo = remotePakFileList[i];
 
                 // Don't download empty files or entries marked as directories (-1)
-                if (r.size <= 0) continue;
+                if (remoteFileInfo.Size <= 0) continue;
 
-                AAPakFileInfo l = FindPatchFileInSortedList(r.name, ref pak.files);
-                if (l == null)
+                // var l = FindPatchFileInSortedList(r.Name, pak.Files);
+                if (!lowerCasePakFileNames.TryGetValue(remoteFileInfo.Name.ToLower(), out var l))
                 {
                     // We don't have a local copy of this file
                     // Add it to the list
-                    dlPakFileList.Add(r);
-                    totSize += r.size;
+                    dlPakFileList.Add((remoteFileInfo, "Missing"));
+                    totSize += remoteFileInfo.Size;
                 }
-                else
+                else if (l.Size != remoteFileInfo.Size)
                 {
-
-                    if ((l.size != r.size) || (l.md5.SequenceEqual(r.md5) == false))
-                    {
-                        // Local Filesize or Hash is different from remote
-                        // Redownload it
-                        dlPakFileList.Add(r);
-                        totSize += r.size;
-                    }
+                    // Local file-size or Hash is different from remote
+                    // Re-download it
+                    dlPakFileList.Add((remoteFileInfo, "Size"));
+                    totSize += remoteFileInfo.Size;
+                }
+                else if (l.Md5.SequenceEqual(remoteFileInfo.Md5) == false)
+                {
+                    // Local file-size or Hash is different from remote
+                    // Re-download it
+                    dlPakFileList.Add((remoteFileInfo, "MD5"));
+                    totSize += remoteFileInfo.Size;
                 }
 
                 if ((i % 100) == 0)
                 {
-                    int p = i * 100 / remotePakFileList.Count;
+                    var p = i * 100 / remotePakFileList.Count;
                     bgwPatcher.ReportProgress(p, aaPatcher);
                     // System.Threading.Thread.Sleep(1);
                 }
@@ -2770,6 +3085,8 @@ namespace AAEmu.Launcher
                 aaPatcher.DoneMsg = L.NoFilesToUpdate;
                 return;
             }
+            if (CancelPatching)
+                return;
 
             //-------------------------------------------------
             // Initialize download.patch file (patch pak file)
@@ -2790,22 +3107,22 @@ namespace AAEmu.Launcher
                     PatchDownloadPak.SaveHeader();
                     PatchDownloadPak.ClosePak();
                 }
-                catch (Exception x)
+                catch (Exception ex)
                 {
                     aaPatcher.Fase = PatchFase.Error;
-                    aaPatcher.ErrorMsg = string.Format(L.ErrorCreatingPatchCache, x.Message);
+                    aaPatcher.ErrorMsg = string.Format(L.ErrorCreatingPatchCache, ex.Message);
                     return;
                 }
             }
 
+            if (CancelPatching)
+                return;
+
             PatchDownloadPak.OpenPak(aaPatcher.localPatchDirectory + localPatchPakFileName, false);
-            if (!PatchDownloadPak.isOpen)
+            if (!PatchDownloadPak.IsOpen)
             {
                 // TODO: Add better support in case of fails
-                //aaPatcher.Fase = PatchFase.Error;
-                //aaPatcher.ErrorMsg = "Failed to open patch cache for writing, might be corrupted !";
-                //return;
-                MessageBox.Show(L.FailedToOpenPatchCache, "CACHE ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(L.FailedToOpenPatchCache, @"CACHE ERROR", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 try
                 {
                     PatchDownloadPak.ClosePak();
@@ -2816,7 +3133,7 @@ namespace AAEmu.Launcher
                     PatchDownloadPak = null;
                 }
 
-                if ((PatchDownloadPak == null) || (!PatchDownloadPak.isOpen))
+                if ((PatchDownloadPak == null) || (!PatchDownloadPak.IsOpen))
                 {
                     aaPatcher.Fase = PatchFase.Error;
                     aaPatcher.ErrorMsg = L.FatalErrorFailedToOpenFileForWrite;
@@ -2826,25 +3143,27 @@ namespace AAEmu.Launcher
 
             // Generate a list of files to download
             // Skip any file that is already in our download.patch
-            List<string> sl = new List<string>();
+            var sl = new List<string>();
 
             totSize = 0; // calculate this again on the final list
-            for (int i = dlPakFileList.Count - 1; i >= 0; i--)
+            for (var i = dlPakFileList.Count - 1; i >= 0; i--)
             {
-                if (PatchDownloadPak.FileExists(dlPakFileList[i].name))
+                if (PatchDownloadPak.FileExists(dlPakFileList[i].Item1.Name))
                 {
                     dlPakFileList.Remove(dlPakFileList[i]);
                 }
                 else
                 {
-                    totSize += dlPakFileList[i].size;
-                    sl.Add(dlPakFileList[i].name);
+                    totSize += dlPakFileList[i].Item1.Size;
+                    sl.Add(dlPakFileList[i].Item2 + " (" + (dlPakFileList[i].Item1.Size / 1024) + "KB) => " + dlPakFileList[i].Item1.Name);
                 }
             }
             aaPatcher.FileDownloadSizeTotal = totSize;
 
             // debug file to check what we'll download
             File.WriteAllLines(aaPatcher.localPatchDirectory + "download.txt", sl);
+            if (CancelPatching)
+                return;
 
             // MessageBox.Show("Need to download " + dlPakFileList.Count.ToString() + " files, "+ (aaPatcher.FileDownloadSizeTotal / 1024 / 1024).ToString() + " MB total");
 
@@ -2857,174 +3176,260 @@ namespace AAEmu.Launcher
             bgwPatcher.ReportProgress(0, aaPatcher);
 
             aaPatcher.FileDownloadSizeDownloaded = 0;
-            for (int i = dlPakFileList.Count - 1; i >= 0; i--)
+            for (var i = dlPakFileList.Count - 1; i >= 0; i--)
             {
-                AAPakFileInfo pfi = dlPakFileList[i];
-                var fileDLurl = Setting.ServerGameUpdateURL + pfi.name;
+                var pfi = dlPakFileList[i].Item1;
+                var fileDlUrl = MakefileDownloadUrl(pfi.Name);
 
                 try
                 {
-                    Stream fileDL = WebHelper.SimpleGetURIAsMemoryStream(fileDLurl);
-                    if (fileDL.Length != pfi.size)
+                    var fileDlStream = WebHelper.SimpleGetURIAsMemoryStream(fileDlUrl, out var returnException);
+
+                    if (returnException != null)
                     {
                         aaPatcher.Fase = PatchFase.Error;
-                        aaPatcher.ErrorMsg = string.Format(L.DownloadSizeMismatch, fileDLurl, pfi.size.ToString(), fileDL.Length.ToString());
-                        fileDL.Dispose();
+                        aaPatcher.ErrorMsg = string.Format(L.DownloadFileError, fileDlUrl + "\n\r" + returnException.Message);
+                        fileDlStream.Dispose();
                         return;
                     }
-                    fileDL.Position = 0;
-                    var fileHash = WebHelper.GetMD5FromStream(fileDL);
-                    var expectHash = BitConverter.ToString(pfi.md5).Replace("-", "").ToLower();
+
+                    if (fileDlStream.Length != pfi.Size)
+                    {
+                        aaPatcher.Fase = PatchFase.Error;
+                        aaPatcher.ErrorMsg = string.Format(L.DownloadSizeMismatch, fileDlUrl, pfi.Size.ToString(), fileDlStream.Length.ToString());
+                        fileDlStream.Dispose();
+                        return;
+                    }
+
+                    fileDlStream.Position = 0;
+                    var fileHash = WebHelper.GetMD5FromStream(fileDlStream);
+                    var expectHash = BitConverter.ToString(pfi.Md5).Replace("-", "").ToLower();
                     if (fileHash != expectHash)
                     {
                         aaPatcher.Fase = PatchFase.Error;
-                        aaPatcher.ErrorMsg = string.Format(L.DownloadHashMismatch, fileDLurl, expectHash, fileHash);
-                        fileDL.Dispose();
+                        aaPatcher.ErrorMsg = string.Format(L.DownloadHashMismatch, fileDlUrl, expectHash, fileHash);
+                        fileDlStream.Dispose();
                         return;
                     }
-                    var addpfi = PatchDownloadPak.nullAAPakFileInfo;
-                    fileDL.Position = 0;
-                    var addRes = PatchDownloadPak.AddFileFromStream(pfi.name, fileDL, DateTime.FromFileTime(pfi.createTime), DateTime.FromFileTime(pfi.modifyTime), false, out addpfi);
+
+                    fileDlStream.Position = 0;
+                    var addRes = PatchDownloadPak.AddFileFromStream(pfi.Name, fileDlStream, DateTime.FromFileTime(pfi.CreateTime), DateTime.FromFileTime(pfi.ModifyTime), false, out var addPfi);
                     if (!addRes)
                     {
                         aaPatcher.Fase = PatchFase.Error;
-                        aaPatcher.ErrorMsg = string.Format(L.FailedToSaveCache, pfi.name);
-                        fileDL.Dispose();
+                        aaPatcher.ErrorMsg = string.Format(L.FailedToSaveCache, pfi.Name);
+                        fileDlStream.Dispose();
                         return;
                     }
-                    fileDL.Dispose();
+                    fileDlStream.Dispose();
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Console.WriteLine($@"Error downloading {fileDlUrl} with error {ex.Message}");
                     aaPatcher.Fase = PatchFase.Error;
-                    aaPatcher.ErrorMsg = string.Format(L.DownloadFileError, fileDLurl);
+                    aaPatcher.ErrorMsg = string.Format(L.DownloadFileError, fileDlUrl + "\n\r" + ex.Message);
                     return;
                 }
 
-                aaPatcher.FileDownloadSizeDownloaded += pfi.size;
+                aaPatcher.FileDownloadSizeDownloaded += pfi.Size;
 
-                var dlprogress = (aaPatcher.FileDownloadSizeDownloaded * 100) / aaPatcher.FileDownloadSizeTotal;
-                bgwPatcher.ReportProgress((int)dlprogress, aaPatcher);
+                var dlProgress = (aaPatcher.FileDownloadSizeDownloaded * 100) / aaPatcher.FileDownloadSizeTotal;
+                bgwPatcher.ReportProgress((int)dlProgress, aaPatcher);
+
+                PatchDownloadPak.SaveHeader();
+                if (CancelPatching)
+                    return;
             }
-            PatchDownloadPak.SaveHeader();
 
             //------------------------------------
             // Check if we need to extract the DB
             //------------------------------------
-            bool exportDBAsWell = false;
-            var dbNameInPak = "game/db/compact.sqlite3";
+            var exportDbAsWell = false;
+            const string dbNameInPak = "game/db/compact.sqlite3";
             if (PatchDownloadPak.FileExists(dbNameInPak))
             {
                 Stream testStream = PatchDownloadPak.ExportFileAsStream(dbNameInPak);
                 if (IsValidSQLiteFile(testStream))
-                    exportDBAsWell = true;
+                    exportDbAsWell = true;
                 testStream.Dispose();
             }
-            var bin32Dir = "bin32/";
+            const string bin32Dir = "bin32/";
 
-            //--------------------------------------------------------------------------------------
-            // Recalculate the total size to apply (including data to copy outside of the game_pak)
-            //--------------------------------------------------------------------------------------
+            //----------------------------------------------------------------------------------
+            // Recalculate the total size to apply (including data to copy out of the game_pak)
+            //----------------------------------------------------------------------------------
             aaPatcher.FileDownloadSizeTotal = 0;
-            foreach (AAPakFileInfo pfi in PatchDownloadPak.files)
+            foreach (var pfi in PatchDownloadPak.Files)
             {
-                aaPatcher.FileDownloadSizeTotal += pfi.size;
+                aaPatcher.FileDownloadSizeTotal += pfi.Size;
                 // Count files inside bin32 twice
-                if ((pfi.name.Length > bin32Dir.Length) && (pfi.name.Substring(0, bin32Dir.Length) == bin32Dir))
+                if ((pfi.Name.Length > bin32Dir.Length) && (pfi.Name.Substring(0, bin32Dir.Length) == bin32Dir))
                 {
-                    aaPatcher.FileDownloadSizeTotal += pfi.size;
+                    aaPatcher.FileDownloadSizeTotal += pfi.Size;
                 }
                 // count compact.sqlite3 twice if it's not encrypted
-                if ((pfi.name == dbNameInPak) && (exportDBAsWell))
+                if ((pfi.Name == dbNameInPak) && (exportDbAsWell))
                 {
-                    aaPatcher.FileDownloadSizeTotal += pfi.size;
+                    aaPatcher.FileDownloadSizeTotal += pfi.Size;
                 }
             }
 
 
-            aaPatcher.FileDownloadSizeDownloaded = 0; // using downloadedsize as progress bar
+            aaPatcher.FileDownloadSizeDownloaded = 0; // using downloaded size as progress bar
             aaPatcher.Fase = PatchFase.AddFiles;
             //---------------------------------------------
             // Apply downloaded files, export where needed
             //---------------------------------------------
-            foreach (AAPakFileInfo pfi in PatchDownloadPak.files)
+            foreach (var pfi in PatchDownloadPak.Files)
             {
-                Stream exportStream = PatchDownloadPak.ExportFileAsStream(pfi);
+                if (CancelPatching)
+                    return;
+
+                var exportStream = PatchDownloadPak.ExportFileAsStream(pfi);
                 exportStream.Position = 0;
-                var respfi = pak.nullAAPakFileInfo;
-                var addRes = pak.AddFileFromStream(pfi.name, exportStream, DateTime.FromFileTime(pfi.createTime), DateTime.FromFileTime(pfi.modifyTime), false, out respfi);
+
+                var addRes = pak.AddFileFromStream(pfi.Name, exportStream, DateTime.FromFileTime(pfi.CreateTime), DateTime.FromFileTime(pfi.ModifyTime), false, out var resPfi);
                 if (!addRes)
                 {
                     aaPatcher.Fase = PatchFase.Error;
-                    aaPatcher.ErrorMsg = string.Format(L.ErrorPatchApplyFile, pfi.name);
+                    aaPatcher.ErrorMsg = string.Format(L.ErrorPatchApplyFile, pfi.Name);
                     exportStream.Dispose();
                     return;
                 }
-                aaPatcher.FileDownloadSizeDownloaded += pfi.size;
+                aaPatcher.FileDownloadSizeDownloaded += pfi.Size;
 
                 // always export files inside bin32
-                if ((pfi.name.Length > bin32Dir.Length) && (pfi.name.Substring(0, bin32Dir.Length) == bin32Dir))
+                var exportErrorCount = 0;
+                if ((pfi.Name.Length > bin32Dir.Length) && (pfi.Name.Substring(0, bin32Dir.Length) == bin32Dir))
                 {
-                    try
+                    var fileOk = false;
+                    while (!fileOk)
                     {
-                        var destName = aaPatcher.localGameFolder + pfi.name.Replace('/', Path.DirectorySeparatorChar);
-                        Directory.CreateDirectory(Path.GetDirectoryName(destName));
-                        FileStream fs = new FileStream(destName, FileMode.Create);
-                        exportStream.Position = 0;
+                        try
+                        {
+                            var destName = aaPatcher.localGameFolder + pfi.Name.Replace('/', Path.DirectorySeparatorChar);
+                            _ = Directory.CreateDirectory(Path.GetDirectoryName(destName));
+                            var fs = new FileStream(destName, FileMode.Create);
+                            exportStream.Position = 0;
 
-                        exportStream.CopyTo(fs);
+                            exportStream.CopyTo(fs);
 
-                        fs.Dispose();
+                            fs.Dispose();
 
-                        // Update file details
-                        File.SetCreationTime(destName, DateTime.FromFileTime(pfi.createTime));
-                        File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.modifyTime));
-                        aaPatcher.FileDownloadSizeDownloaded += pfi.size;
+                            // Update file details
+                            File.SetCreationTime(destName, DateTime.FromFileTime(pfi.CreateTime));
+                            File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.ModifyTime));
+                            aaPatcher.FileDownloadSizeDownloaded += pfi.Size;
+                            fileOk = true;
+                        }
+                        catch
+                        {
+                            exportStream.Dispose();
+                        }
+
+                        if (!fileOk)
+                        {
+                            // Something went wrong while exporting
+                            var retryRes = MessageBox.Show(string.Format(L.ErrorPatchExportFile, pfi.Name), L.AddFiles, MessageBoxButtons.AbortRetryIgnore);
+                            switch(retryRes)
+                            {
+                                case DialogResult.Retry:
+                                    fileOk = false;
+                                    break;
+                                case DialogResult.Abort:
+                                    exportErrorCount++;
+                                    aaPatcher.Fase = PatchFase.Error;
+                                    aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportFile, pfi.Name);
+                                    break;
+                                case DialogResult.Ignore:
+                                    fileOk = true;
+                                    break;
+                                case DialogResult.None:
+                                case DialogResult.OK:
+                                case DialogResult.Cancel:
+                                case DialogResult.Yes:
+                                case DialogResult.No:
+                                default:
+                                    break;
+                            }
+                        }
                     }
-                    catch
+
+                    if (exportErrorCount > 0)
                     {
                         aaPatcher.Fase = PatchFase.Error;
-                        aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportFile, pfi.name);
-                        exportStream.Dispose();
-                        return;
+                        aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportFile, pfi.Name);
                     }
-
                 }
 
                 // export compact.sqlite3 if it's not encrypted
-                if ((pfi.name == dbNameInPak) && (exportDBAsWell))
+                if ((pfi.Name == dbNameInPak) && (exportDbAsWell))
                 {
-                    try
+                    var fileOk = false;
+                    while (!fileOk)
                     {
-                        var destName = aaPatcher.localGameFolder + pfi.name.Replace('/', Path.DirectorySeparatorChar);
-                        Directory.CreateDirectory(Path.GetDirectoryName(destName));
-                        FileStream fs = new FileStream(destName, FileMode.Create);
-                        exportStream.Position = 0;
+                        try
+                        {
+                            var destName = aaPatcher.localGameFolder + pfi.Name.Replace('/', Path.DirectorySeparatorChar);
+                            Directory.CreateDirectory(Path.GetDirectoryName(destName));
+                            var fs = new FileStream(destName, FileMode.Create);
+                            exportStream.Position = 0;
 
-                        exportStream.CopyTo(fs);
+                            exportStream.CopyTo(fs);
 
-                        fs.Dispose();
+                            fs.Dispose();
 
-                        // Update file details
-                        File.SetCreationTime(destName, DateTime.FromFileTime(pfi.createTime));
-                        File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.modifyTime));
-                        aaPatcher.FileDownloadSizeDownloaded += pfi.size;
-                    }
-                    catch
-                    {
-                        aaPatcher.Fase = PatchFase.Error;
-                        aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportDB, pfi.name);
-                        exportStream.Dispose();
-                        return;
+                            // Update file details
+                            File.SetCreationTime(destName, DateTime.FromFileTime(pfi.CreateTime));
+                            File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.ModifyTime));
+                            aaPatcher.FileDownloadSizeDownloaded += pfi.Size;
+                            fileOk = true;
+                        }
+                        catch
+                        {
+                            //aaPatcher.Fase = PatchFase.Error;
+                            //aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportDB, pfi.name);
+                            exportStream.Dispose();
+                            // return;
+                        }
+
+                        if (!fileOk)
+                        {
+                            // Something went wrong while exporting
+                            var retryRes = MessageBox.Show(string.Format(L.ErrorPatchExportFile, pfi.Name), L.AddFiles, MessageBoxButtons.AbortRetryIgnore);
+                            switch (retryRes)
+                            {
+                                case DialogResult.Retry:
+                                    fileOk = false;
+                                    break;
+                                case DialogResult.Abort:
+                                    aaPatcher.Fase = PatchFase.Error;
+                                    aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportDB, pfi.Name);
+                                    break;
+                                case DialogResult.Ignore:
+                                    fileOk = true;
+                                    break;
+                                case DialogResult.None:
+                                case DialogResult.OK:
+                                case DialogResult.Cancel:
+                                case DialogResult.Yes:
+                                case DialogResult.No:
+                                default:
+                                    break;
+                            }
+                        }
+
                     }
                 }
-                if (exportStream != null)
-                    exportStream.Dispose();
 
-                var patchprogress = (aaPatcher.FileDownloadSizeDownloaded * 100) / aaPatcher.FileDownloadSizeTotal;
-                bgwPatcher.ReportProgress((int)patchprogress, aaPatcher);
+                exportStream?.Dispose();
+
+                var patchProgress = (aaPatcher.FileDownloadSizeDownloaded * 100) / aaPatcher.FileDownloadSizeTotal;
+                bgwPatcher.ReportProgress((int)patchProgress, aaPatcher);
 
             }
+            if (CancelPatching)
+                return;
 
             //-------------------------------------------
             // Delete all files mentioned in deleted.txt
@@ -3044,6 +3449,7 @@ namespace AAEmu.Launcher
                         slDelFiles.Add(s);
                     }
                 }
+
                 exportStream.Dispose();
 
                 foreach (string s in slDelFiles)
@@ -3053,7 +3459,10 @@ namespace AAEmu.Launcher
                         File.Delete(aaPatcher.localGameFolder + delName);
                 }
             }
-            catch { }
+            catch
+            {
+                //
+            }
 
             System.Threading.Thread.Sleep(250);
 
@@ -3156,7 +3565,7 @@ namespace AAEmu.Launcher
                 {
                     // Save our .ver file again
                     File.WriteAllText(aaPatcher.localPatchDirectory + patchVersionFileName, aaPatcher.remoteVersionString);
-                    // Delete Patch Pak if completed succesfully
+                    // Delete Patch Pak if completed successfully
                     // Keep patch cache file if debugging
                     if (debugModeToolStripMenuItem.Checked == false)
                         File.Delete(aaPatcher.localPatchDirectory + localPatchPakFileName);
@@ -3174,7 +3583,7 @@ namespace AAEmu.Launcher
 
             serverCheckStatus = serverCheck.Unknown;
             nextServerCheck = 1000;
-            updatePlayButton(serverCheckStatus, false);
+            UpdatePlayButton(serverCheckStatus, false);
             ShowPanelControls(0);
         }
 
@@ -3191,7 +3600,7 @@ namespace AAEmu.Launcher
         {
             serverCheckStatus = serverCheck.Unknown; // Force to unknown mode
             nextServerCheck = -1;
-            updatePlayButton(serverCheckStatus, false);
+            UpdatePlayButton(serverCheckStatus, false);
             ShowPanelControls(0); // Update Panel
 
         }
@@ -3222,7 +3631,9 @@ namespace AAEmu.Launcher
                 return;
 
             // C:\ArcheAge\Documents => UserHomeFolder\ArcheAge
-            string systemConfigFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar + "ArcheAge" + Path.DirectorySeparatorChar + archeAgeSystemConfigFileName;
+            var folder = File.Exists(Setting.PathToGame) ? GuessDocumentsFolder(Setting.PathToGame) : "ArcheAge";
+
+            string systemConfigFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), folder, archeAgeSystemConfigFileName);
             File.Delete(systemConfigFile);
         }
 
@@ -3251,9 +3662,14 @@ namespace AAEmu.Launcher
             }
 
             if (pak == null)
-                pak = new AAPak(aaPatcher.localGame_Pak);
+            {
+                //pak = new AAPak(aaPatcher.localGame_Pak, false, false);
+                pak = new AAPak("");
+                TryLoadCustomKey(pak, aaPatcher.localGame_Pak);
+                pak.OpenPak(aaPatcher.localGame_Pak, false);
+            }
 
-            if (!pak.isOpen)
+            if (!pak.IsOpen)
             {
                 Cursor.Current = Cursors.Default;
                 Application.UseWaitCursor = false;
@@ -3267,16 +3683,16 @@ namespace AAEmu.Launcher
             //---------------------------------------------
             // Apply downloaded files, export where needed
             //---------------------------------------------
-            foreach (AAPakFileInfo pfi in pak.files)
+            foreach (AAPakFileInfo pfi in pak.Files)
             {
 
                 // always export files inside bin32
-                if ((pfi.name.Length > bin32Dir.Length) && (pfi.name.Substring(0, bin32Dir.Length) == bin32Dir))
+                if ((pfi.Name.Length > bin32Dir.Length) && (pfi.Name.Substring(0, bin32Dir.Length) == bin32Dir))
                 {
                     try
                     {
                         Stream exportStream = pak.ExportFileAsStream(pfi);
-                        var destName = aaPatcher.localGameFolder + pfi.name.Replace('/', Path.DirectorySeparatorChar);
+                        var destName = aaPatcher.localGameFolder + pfi.Name.Replace('/', Path.DirectorySeparatorChar);
                         Directory.CreateDirectory(Path.GetDirectoryName(destName));
                         FileStream fs = new FileStream(destName, FileMode.Create);
                         exportStream.Position = 0;
@@ -3286,28 +3702,28 @@ namespace AAEmu.Launcher
                         fs.Dispose();
 
                         // Update file details
-                        File.SetCreationTime(destName, DateTime.FromFileTime(pfi.createTime));
-                        File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.modifyTime));
-                        aaPatcher.FileDownloadSizeDownloaded += pfi.size;
+                        File.SetCreationTime(destName, DateTime.FromFileTime(pfi.CreateTime));
+                        File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.ModifyTime));
+                        aaPatcher.FileDownloadSizeDownloaded += pfi.Size;
                     }
                     catch
                     {
                         aaPatcher.Fase = PatchFase.Error;
-                        aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportFile, pfi.name);
+                        aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportFile, pfi.Name);
                         return;
                     }
 
                 }
 
                 // export compact.sqlite3 if it's not encrypted
-                if (pfi.name == dbNameInPak)
+                if (pfi.Name == dbNameInPak)
                 {
                     try
                     {
                         Stream exportStream = pak.ExportFileAsStream(pfi);
                         if (IsValidSQLiteFile(exportStream))
                         {
-                            var destName = aaPatcher.localGameFolder + pfi.name.Replace('/', Path.DirectorySeparatorChar);
+                            var destName = aaPatcher.localGameFolder + pfi.Name.Replace('/', Path.DirectorySeparatorChar);
                             Directory.CreateDirectory(Path.GetDirectoryName(destName));
                             FileStream fs = new FileStream(destName, FileMode.Create);
                             exportStream.Position = 0;
@@ -3317,15 +3733,15 @@ namespace AAEmu.Launcher
                             fs.Dispose();
 
                             // Update file details
-                            File.SetCreationTime(destName, DateTime.FromFileTime(pfi.createTime));
-                            File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.modifyTime));
-                            aaPatcher.FileDownloadSizeDownloaded += pfi.size;
+                            File.SetCreationTime(destName, DateTime.FromFileTime(pfi.CreateTime));
+                            File.SetLastWriteTime(destName, DateTime.FromFileTime(pfi.ModifyTime));
+                            aaPatcher.FileDownloadSizeDownloaded += pfi.Size;
                         }
                     }
                     catch
                     {
                         aaPatcher.Fase = PatchFase.Error;
-                        aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportDB, pfi.name);
+                        aaPatcher.ErrorMsg = string.Format(L.ErrorPatchExportDB, pfi.Name);
                         return;
                     }
                 }
@@ -3369,6 +3785,162 @@ namespace AAEmu.Launcher
         private void DirectXtoolStripMenuItem_Click(object sender, EventArgs e)
         {
             Process.Start(dx9downloadURL);
+        }
+
+        private void TryLoadCustomKey(AAPak aPak, string pakFileName)
+        {
+            byte[] customKey = new byte[16];
+            string fn;
+
+            // PAK-Header Key
+            fn = Path.ChangeExtension(pakFileName, ".key");
+            if (File.Exists(fn))
+            {
+                FileStream fs = new FileStream(fn, FileMode.Open, FileAccess.Read);
+                if (fs.Length != 16)
+                {
+                    fs.Dispose();
+                    return;
+                }
+                fs.Read(customKey, 0, 16);
+                fs.Dispose();
+                aPak.SetCustomKey(customKey);
+            }
+        }
+
+        private void stAuthAuto_Click(object sender, EventArgs e)
+        {
+            if (sender is ToolStripItem tsi)
+            {
+                if (tsi.Text.ToLower() == "auto")
+                {
+                    Setting.ClientLoginType = "auto";
+                    GuessAndUpdateClientType();
+                }
+                else
+                {
+                    foreach (var l in AAEmuLauncherBase.AllLaunchers)
+                    {
+                        if (l.DisplayName == tsi.Text)
+                        {
+                            Setting.ClientLoginType = l.ConfigName;
+                        }
+                    }
+                    UpdateGameClientTypeLabel();
+                }
+            }
+        }
+
+        private void generateServerURILinkToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using(var genform = new URIGenForm())
+            {
+                genform.tServerIP.Text = Setting.ServerIpAddress;
+                genform.tConfigName.Text = Setting.ConfigName;
+                genform.tUserName.Text = Setting.LastLoginUser;
+                genform.tPassword.Text = "";
+                genform.tAuthDriver.Text = Setting.ClientLoginType;
+                genform.tWebsite.Text = Setting.ServerWebSiteURL;
+                genform.tNews.Text = Setting.ServerNewsFeedURL;
+                genform.tPatchLocation.Text = Setting.ServerGameUpdateURL;
+                genform.ShowDialog();
+            }
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void btnClose_MouseEnter(object sender, EventArgs e)
+        {
+            btnClose.Image = Properties.Resources.btn_exit_active;
+        }
+
+        private void btnClose_MouseLeave(object sender, EventArgs e)
+        {
+            btnClose.Image = Properties.Resources.btn_exit;
+        }
+
+        private void btnMinimize_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void btnMinimize_MouseEnter(object sender, EventArgs e)
+        {
+            btnMinimize.Image = Properties.Resources.btn_minimize_active;
+        }
+
+        private void btnMinimize_MouseLeave(object sender, EventArgs e)
+        {
+            btnMinimize.Image = Properties.Resources.btn_minimize;
+        }
+
+        private void btnSystem_MouseEnter(object sender, EventArgs e)
+        {
+            btnSystem.Image = Properties.Resources.btn_aaemu_active;
+        }
+
+        private void btnSystem_MouseLeave(object sender, EventArgs e)
+        {
+            btnSystem.Image = Properties.Resources.btn_aaemu;
+        }
+
+        public static DialogResult InputBox(string title, string promptText, ref string value)
+        {
+            Form form = new Form();
+            Label label = new Label();
+            TextBox textBox = new TextBox();
+            Button buttonOk = new Button();
+            Button buttonCancel = new Button();
+
+            form.Text = title;
+            label.Text = promptText;
+            textBox.Text = value;
+
+            buttonOk.Text = "OK";
+            buttonCancel.Text = "Cancel";
+            buttonOk.DialogResult = DialogResult.OK;
+            buttonCancel.DialogResult = DialogResult.Cancel;
+
+            label.SetBounds(9, 20, 372, 13);
+            textBox.SetBounds(12, 36, 372, 20);
+            buttonOk.SetBounds(228, 72, 75, 23);
+            buttonCancel.SetBounds(309, 72, 75, 23);
+
+            label.AutoSize = true;
+            textBox.Anchor = textBox.Anchor | AnchorStyles.Right;
+            buttonOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            buttonCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+
+            form.ClientSize = new Size(396, 107);
+            form.Controls.AddRange(new Control[] { label, textBox, buttonOk, buttonCancel });
+            form.ClientSize = new Size(Math.Max(300, label.Right + 10), form.ClientSize.Height);
+            form.FormBorderStyle = FormBorderStyle.FixedDialog;
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.MinimizeBox = false;
+            form.MaximizeBox = false;
+            form.AcceptButton = buttonOk;
+            form.CancelButton = buttonCancel;
+
+            DialogResult dialogResult = form.ShowDialog();
+            value = textBox.Text;
+            return dialogResult;
+        }
+
+        private void unknownToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string v = Setting.Lang;
+            if (InputBox(L.UpdateLocale,"Custom Locale",ref v) == DialogResult.OK)
+            {
+                Setting.Lang = v;
+                UpdateLocaleLanguage();
+            }
+        }
+
+        private void clearPatchCacheToolStripMenuItem_Click(object sender, EventArgs e)
+        {
 
         }
     }

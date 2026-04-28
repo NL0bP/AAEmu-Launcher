@@ -1,0 +1,21 @@
+{
+  "configName": "AAEmu 1.2 Public Test Server",
+  "lang": "en_us",
+  "launcherLang": "en_us",
+  "pathToGame": "",
+  "serverIPAddress": "23.95.226.188",
+  "saveLoginAndPassword": false,
+  "skipIntro": false,
+  "hideSplashLogo": false,
+  "lastLoginUser": "",
+  "lastLoginPass": "",
+  "loginType": "trino_1_2",
+  "updateLocale": true,
+  "allowGameUpdates": false,
+  "serverGameUpdateURL": "",
+  "serverWebsiteURL": "",
+  "serverNewsFeedURL": "",
+  "serverDiscordURL": "",
+  "serverDiscordName": "",
+  "userHistory": []
+}
